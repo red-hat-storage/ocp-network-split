@@ -1,0 +1,13 @@
+*.py[oc]
+.*.swp
+*~
+*.egg-info
+.eggs
+.env
+build
+dist
+tmp
+*.html
+.tox
+.cache
+.pytest_cache
