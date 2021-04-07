@@ -1,0 +1,4 @@
+graft ocp_network_split
+graft tests
+graft docs
+global-exclude *.py[cod] __pycache__ .gitignore *.html
