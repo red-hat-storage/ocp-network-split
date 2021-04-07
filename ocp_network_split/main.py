@@ -124,6 +124,36 @@ def schedule_split(split_name, target_dt, target_length):
         ocp.run_oc_debug_node(cmd_list, node)
 
 
+def check_split(split_name):
+    """
+    Checks status of split via ``systemctl list-timers`` on all nodes of the
+    cluster.
+
+    Args:
+        split_name (str): network split configuration specification, eg.
+            "ab", see VALID_NETWORK_SPLITS constant
+
+    Raises:
+        ValueError: when invalid ``split_name`` is specified
+    """
+    # input validation
+    if split_name not in zone.VALID_NETWORK_SPLITS:
+        raise ValueError(f"invalid split_name specified: '{split_name}'")
+    # generate systemd timer unit pattern for list-timers
+    start_unit_pattern = f"network-split-{split_name}-setup*"
+    # check status of start timer on every node of the cluster
+    for node in ocp.list_cluster_nodes():
+        print(node)
+        cmd_list = ["systemctl", "list-timers", start_unit_pattern]
+        stdout, _ = ocp.run_oc_debug_node(cmd_list, node)
+        for line in stdout.splitlines():
+            if line.startswith("Pass --all to see"):
+                continue
+            if line.endswith("timers listed."):
+                continue
+            print(line)
+
+
 def main_setup():
     """
     Simple command line interface to generate MachineConfig yaml to deploy to
@@ -131,7 +161,7 @@ def main_setup():
 
     Example usage::
 
-         $ ocs-network-split-setup --zone-label-names arbiter,d1,d2 -o mc.yaml
+         $ ocs-network-split-setup -a arbiter -b d1 -c d2 -o mc.yaml
          $ oc create -f mc.yaml
          $ oc get mcp
 
@@ -198,7 +228,8 @@ def main_sched():
 
     Example usage::
 
-         $ ocs-network-split-sched ab-bc 2021-03-18T18:45 --split-len 30
+         $ ocs-network-split-sched ab-bc -t 2021-03-18T18:45 --split-len 30
+         $ ocs-network-split-sched ab-bc
 
     """
     ap = argparse.ArgumentParser(description="network split scheduler")
@@ -207,7 +238,8 @@ def main_sched():
         choices=zone.VALID_NETWORK_SPLITS,
         help="which split configuration to schedule")
     ap.add_argument(
-        "timestamp",
+        "-t",
+        "--timestamp",
         help="moment when to schedule the network split (in ISO format)")
     ap.add_argument(
         "--split-len",
@@ -223,6 +255,11 @@ def main_sched():
 
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
+
+    if args.timestamp is None:
+        check_split(args.split_name)
+        return
+
     try:
         start_dt = datetime.fromisoformat(args.timestamp)
     except ValueError as ex:
