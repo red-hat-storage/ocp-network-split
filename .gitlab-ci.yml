@@ -1,5 +1,19 @@
 stages:
+  - lint
   - test
+
+flake8:
+  image: python:3.9
+  stage: lint
+  script:
+    - pip install tox
+    - tox -e flake8
+
+shellcheck:
+  image: quay.io/mbukatov/mbukatov-fedora-shellcheck
+  stage: lint
+  script:
+    - shellcheck ocp_network_split/network-split.sh
 
 py37:
   image: python:3.7
@@ -14,10 +28,3 @@ py39:
   script:
     - pip install tox
     - tox -e py39
-
-flake8:
-  image: python:3.9
-  stage: test
-  script:
-    - pip install tox
-    - tox -e flake8
