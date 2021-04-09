@@ -40,16 +40,13 @@ def get_zone_config(zone_a, zone_b, zone_c):
     """
     For each valid ocp-network-split zone name (see
     :py:const:`ocp_network_split.zone.VALID_ZONES`), translate it's given
-    ``topology.kubernetes.io/zone`` label into list of ip addressess of all
+    ``topology.kubernetes.io/zone`` label into list of ip addresses of all
     nodes in the zone.
 
     Args:
-        zone_a (str): value of ``topology.kubernetes.io/zone=value`` label of
-            zone which *ocp network split* will identify as zone ``a``
-        zone_b (str): value of ``topology.kubernetes.io/zone=value`` label of
-            zone which *ocp network split* will identify as zone ``b``
-        zone_c (str): value of ``topology.kubernetes.io/zone=value`` label of
-            zone which *ocp network split* will identify as zone ``c``
+        zone_a (str): value of zone ``a`` label
+        zone_b (str): value of zone ``b`` label
+        zone_c (str): value of zone ``c`` label
 
     Returns:
         ZoneConfig: object with list of node ip addresses for each zone name
@@ -58,7 +55,7 @@ def get_zone_config(zone_a, zone_b, zone_c):
     """
     zc = zone.ZoneConfig()
     for zone_name, label in zip(zone.VALID_ZONES, [zone_a, zone_b, zone_c]):
-        LOGGER.debug("listing all ip addressess of nodes in zone %s", zone)
+        LOGGER.debug("listing all ip addresses of nodes in zone %s", zone)
         cluster_nodes = ocp.list_cluster_nodes(label)
         for node in cluster_nodes:
             zc.add_nodes(zone_name, ocp.get_all_node_ip_addrs(node))
@@ -72,10 +69,11 @@ def get_networksplit_mc_spec(zone_env):
 
     Args:
         zone_env (str): content of firewall zone env file specifying node ip
-            addressess for each cluster zone
+            addresses for each cluster zone, as created by
+            :py:meth:`ocp_network_split.zone.ZoneConfig.get_env_file`
 
     Returns:
-        machineconfig_spec: list of dictrionaries with ``MachineConfig`` spec
+        machineconfig_spec: list of dictionaries with ``MachineConfig`` spec
     """
     mc_spec = []
     for role in "master", "worker":
@@ -89,9 +87,10 @@ def schedule_split(split_name, target_dt, target_length):
 
     Args:
         split_name (str): network split configuration specification, eg.
-            "ab", see VALID_NETWORK_SPLITS constant
+            ``ab``, see
+            :py:const:`ocp_network_split.zone.VALID_NETWORK_SPLITS` constant
         target_dt (datetime): requested start time of the network split
-        target_lenght (int): number of minutes specifying how long the network
+        target_length (int): number of minutes specifying how long the network
             split configuration should be active
 
     Raises:
@@ -131,7 +130,8 @@ def check_split(split_name):
 
     Args:
         split_name (str): network split configuration specification, eg.
-            "ab", see VALID_NETWORK_SPLITS constant
+            ``ab``, see :py:const:`ocp_network_split.zone.VALID_NETWORK_SPLITS`
+            constant
 
     Raises:
         ValueError: when invalid ``split_name`` is specified
@@ -161,7 +161,7 @@ def main_setup():
 
     Example usage::
 
-         $ ocs-network-split-setup -a arbiter -b d1 -c d2 -o mc.yaml
+         $ ocp-network-split-setup -a arbiter -b d1 -c d2 -o mc.yaml
          $ oc create -f mc.yaml
          $ oc get mcp
 
@@ -228,9 +228,8 @@ def main_sched():
 
     Example usage::
 
-         $ ocs-network-split-sched ab-bc -t 2021-03-18T18:45 --split-len 30
-         $ ocs-network-split-sched ab-bc
-
+         $ ocp-network-split-sched ab-bc -t 2021-03-18T18:45 --split-len 30
+         $ ocp-network-split-sched ab-bc
     """
     ap = argparse.ArgumentParser(description="network split scheduler")
     ap.add_argument(
@@ -245,6 +244,7 @@ def main_sched():
         "--split-len",
         metavar="MIN",
         default=15,
+        type=int,
         help="how long the network split should take (in minutes)")
     ap.add_argument(
         "-d",
