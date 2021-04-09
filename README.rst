@@ -13,6 +13,15 @@ about networking configuration of the platform the cluster is deployed on
 (under normal conditions, network separation like this could be done by
 tweaking network components between zones).
 
+Documentation
+-------------
+
+The primary documentation is available at
+https://mbukatov.gitlab.io/ocp-network-split
+
+Source files of the documentation are maintained as a `Sphinx
+<https://www.sphinx-doc.org/en/master>`_ project in ``docs`` directory.
+
 License
 -------
 
