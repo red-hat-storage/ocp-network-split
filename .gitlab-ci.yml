@@ -1,6 +1,7 @@
 stages:
   - lint
   - test
+  - docs
 
 flake8:
   image: python:3.9
@@ -28,3 +29,18 @@ py39:
   script:
     - pip install tox
     - tox -e py39
+
+pages:
+  image: python:3.9
+  stage: docs
+  script:
+    - pip install sphinx
+    - pip install .
+    - cd docs
+    - sphinx-build -M html . _build
+    - mv _build/html ../public
+  artifacts:
+    paths:
+      - public
+  only:
+    - master
