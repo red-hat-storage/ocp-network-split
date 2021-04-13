@@ -20,8 +20,9 @@ show_help()
   echo "Usage: $(basename "${0}") [-d] <setup|teardown> <split-config>"
   echo
   echo "Argument split-config describes network split among 3 zones a, b and c"
+  echo "While zone x denotes external nodes outside of the cluster."
   echo "eg. 'bc' means that connection between zones b and c is lost"
-  echo "Examples of valid splits: bc, ab, ab-bc, ab-ac"
+  echo "Examples of valid splits: bc, ab, ab-bc, ab-ac, ax"
 }
 
 print_current_zone()
@@ -72,6 +73,10 @@ for env_var in ZONE_A ZONE_B ZONE_C; do
     echo "$env_var=\"${!env_var}\""
   fi
 done
+# external zone x is optional
+if [[ -v ZONE_X ]]; then
+  echo "ZONE_X=\"${ZONE_X}\""
+fi
 if [[ $ERROR -eq 1 ]]; then
   exit 2
 fi

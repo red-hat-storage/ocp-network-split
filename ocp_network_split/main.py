@@ -36,7 +36,7 @@ from ocp_network_split import zone
 LOGGER = logging.getLogger(name=__file__)
 
 
-def get_zone_config(zone_a, zone_b, zone_c):
+def get_zone_config(zone_a, zone_b, zone_c, zone_x_addrs=None):
     """
     For each valid ocp-network-split zone name (see
     :py:const:`ocp_network_split.zone.VALID_ZONES`), translate it's given
@@ -47,6 +47,7 @@ def get_zone_config(zone_a, zone_b, zone_c):
         zone_a (str): value of zone ``a`` label
         zone_b (str): value of zone ``b`` label
         zone_c (str): value of zone ``c`` label
+        zone_x_addrs (list): list of ip addresses in external zone ``x``
 
     Returns:
         ZoneConfig: object with list of node ip addresses for each zone name
@@ -59,6 +60,8 @@ def get_zone_config(zone_a, zone_b, zone_c):
         cluster_nodes = ocp.list_cluster_nodes(label)
         for node in cluster_nodes:
             zc.add_nodes(zone_name, ocp.get_all_node_ip_addrs(node))
+    if zone_x_addrs is not None:
+        zc.add_nodes("x", zone_x_addrs)
     return zc
 
 
@@ -201,6 +204,11 @@ def main_setup():
         required=True,
         help="topology.kubernetes.io/zone label of zone c")
     ap.add_argument(
+        "--zone-x-addrs",
+        dest="x_addrs",
+        metavar="IP_ADDRS",
+        help="comma separated list of IP addresses of external services")
+    ap.add_argument(
         "--debug",
         action="store_true",
         help="set log level to DEBUG")
@@ -210,7 +218,11 @@ def main_setup():
         logging.basicConfig(level=logging.DEBUG)
 
     # get node ip addresses of each zone via zone config
-    zone_config = get_zone_config(args.a, args.b, args.c)
+    if args.x_addrs is not None:
+        addr_list = args.x_addrs.split(",")
+    else:
+        addr_list = None
+    zone_config = get_zone_config(args.a, args.b, args.c, addr_list)
     zone_env = zone_config.get_env_file()
 
     if args.print_env_only:

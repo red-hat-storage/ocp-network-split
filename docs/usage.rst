@@ -46,6 +46,14 @@ in the following sections.
 .. _`k8s zone`: https://kubernetes.io/docs/reference/labels-annotations-taints/#topologykubernetesiozone
 .. _`k8s label`: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
 
+External zone 
+=============
+
+Besides normal cluster zones, there is a special zone ``x`` which represents
+external services running outside of a cluster. Specifying list of IP addresses
+for ``x`` zone allows you to block traffic to these IP addresses in both
+directions later.
+
 Command line tools
 ==================
 

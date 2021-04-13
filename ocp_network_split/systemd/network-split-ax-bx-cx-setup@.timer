@@ -1,0 +1,9 @@
+[Unit]
+Description=Schedule setup network split ax-bx-cx at given time
+
+[Timer]
+OnCalendar=@%i
+Unit=network-split@ax-bx-cx.service
+
+[Install]
+WantedBy=timers.target

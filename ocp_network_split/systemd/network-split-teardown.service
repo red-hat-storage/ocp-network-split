@@ -1,5 +1,5 @@
 [Unit]
-Conflicts=network-split@ab-bc.service network-split@ab-ac.service network-split@ab.service network-split@bc.service
+Conflicts=network-split@ab-bc.service network-split@ab-ac.service network-split@ab.service network-split@bc.service network-split@ax.service network-split@ax-bx-cx.service
 
 [Service]
 Type=oneshot

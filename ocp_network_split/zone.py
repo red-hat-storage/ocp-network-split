@@ -15,13 +15,13 @@
 # limitations under the License.
 
 
-VALID_ZONES = ("a", "b", "c")
+VALID_ZONES = ("a", "b", "c", "x")
 """
 Stable zone identifiers as defined and used by ocp-network-split.
 """
 
 
-VALID_NETWORK_SPLITS = ("ab", "bc", "ab-bc", "ab-ac")
+VALID_NETWORK_SPLITS = ("ab", "bc", "ab-bc", "ab-ac", "ax", "ax-bx-cx")
 """
 Available network split configurations. For every valid network split value,
 there is a systemd timer unit named ``network-split-{split}-setup@.timer``.
