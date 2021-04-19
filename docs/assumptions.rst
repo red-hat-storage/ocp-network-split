@@ -8,6 +8,8 @@ We assume that the cluster has 3 zones.
 There is no limitation on actuall zone names (values of
 ``topology.kubernetes.io/zone`` label key).
 
+We assume that the cluster is using IPv4 addresses only.
+
 While Linux kernel of RHEL CoreOS (RHCOS) uses ``nftables`` internally, the
 ``iptables`` cli tool which uses ``nftables`` backed is preinstalled on RHCOS
 hosts of OCP 4 clusters. The firewall script thus assumes that ``iptables`` cli
