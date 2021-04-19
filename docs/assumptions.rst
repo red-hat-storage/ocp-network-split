@@ -22,4 +22,6 @@ We assume that there are only ``master`` and ``worker`` MachineConfigPools
 machine config pool such as ``infra``, the network split configuration won't
 be able to change firewall rules on nodes in this additional pool.
 
+You have ``oc`` command installed and you are logged in as ``kubeadmin`` user.
+
 .. _`time synchronized via ntp`: https://docs.openshift.com/container-platform/4.6/post_installation_configuration/machine-configuration-tasks.html#installation-special-config-chrony_post-install-machine-configuration-tasks
