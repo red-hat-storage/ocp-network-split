@@ -28,9 +28,9 @@ import sys
 
 import yaml
 
-from ocp_network_split import machineconfig
-from ocp_network_split import ocp
-from ocp_network_split import zone
+from ocpnetsplit import machineconfig
+from ocpnetsplit import ocp
+from ocpnetsplit import zone
 
 
 LOGGER = logging.getLogger(name=__file__)
@@ -39,7 +39,7 @@ LOGGER = logging.getLogger(name=__file__)
 def get_zone_config(zone_a, zone_b, zone_c, zone_x_addrs=None):
     """
     For each valid ocp-network-split zone name (see
-    :py:const:`ocp_network_split.zone.VALID_ZONES`), translate it's given
+    :py:const:`ocpnetsplit.zone.ZONES`), translate it's given
     ``topology.kubernetes.io/zone`` label into list of ip addresses of all
     nodes in the zone.
 
@@ -52,10 +52,10 @@ def get_zone_config(zone_a, zone_b, zone_c, zone_x_addrs=None):
     Returns:
         ZoneConfig: object with list of node ip addresses for each zone name
             *ocp network split* works with (``a``, ``b``, ...),
-            see :py:const:`ocp_network_split.zone.VALID_ZONES`).
+            see :py:const:`ocpnetsplit.zone.ZONES`).
     """
     zc = zone.ZoneConfig()
-    for zone_name, label in zip(zone.VALID_ZONES, [zone_a, zone_b, zone_c]):
+    for zone_name, label in zip(zone.ZONES, [zone_a, zone_b, zone_c]):
         LOGGER.debug("listing all ip addresses of nodes in zone %s", zone)
         cluster_nodes = ocp.list_cluster_nodes(label)
         for node in cluster_nodes:
@@ -73,7 +73,7 @@ def get_networksplit_mc_spec(zone_env):
     Args:
         zone_env (str): content of firewall zone env file specifying node ip
             addresses for each cluster zone, as created by
-            :py:meth:`ocp_network_split.zone.ZoneConfig.get_env_file`
+            :py:meth:`ocpnetsplit.zone.ZoneConfig.get_env_file`
 
     Returns:
         machineconfig_spec: list of dictionaries with ``MachineConfig`` spec
@@ -91,7 +91,7 @@ def schedule_split(split_name, target_dt, target_length):
     Args:
         split_name (str): network split configuration specification, eg.
             ``ab``, see
-            :py:const:`ocp_network_split.zone.VALID_NETWORK_SPLITS` constant
+            :py:const:`ocpnetsplit.zone.NETWORK_SPLITS` constant
         target_dt (datetime): requested start time of the network split
         target_length (int): number of minutes specifying how long the network
             split configuration should be active
@@ -101,7 +101,7 @@ def schedule_split(split_name, target_dt, target_length):
             specified.
     """
     # input validation
-    if split_name not in zone.VALID_NETWORK_SPLITS:
+    if split_name not in zone.NETWORK_SPLITS:
         raise ValueError(f"invalid split_name specified: '{split_name}'")
     now_dt = datetime.now()
     # scheduling could take about 30 seconds for a cluster with 9 machines
@@ -133,14 +133,14 @@ def check_split(split_name):
 
     Args:
         split_name (str): network split configuration specification, eg.
-            ``ab``, see :py:const:`ocp_network_split.zone.VALID_NETWORK_SPLITS`
+            ``ab``, see :py:const:`ocpnetsplit.zone.NETWORK_SPLITS`
             constant
 
     Raises:
         ValueError: when invalid ``split_name`` is specified
     """
     # input validation
-    if split_name not in zone.VALID_NETWORK_SPLITS:
+    if split_name not in zone.NETWORK_SPLITS:
         raise ValueError(f"invalid split_name specified: '{split_name}'")
     # generate systemd timer unit pattern for list-timers
     start_unit_pattern = f"network-split-{split_name}-setup*"
@@ -246,7 +246,7 @@ def main_sched():
     ap = argparse.ArgumentParser(description="network split scheduler")
     ap.add_argument(
         "split_name",
-        choices=zone.VALID_NETWORK_SPLITS,
+        choices=zone.NETWORK_SPLITS,
         help="which split configuration to schedule")
     ap.add_argument(
         "-t",

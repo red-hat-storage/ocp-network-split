@@ -139,7 +139,7 @@ def create_mc_dict(role, zone_env):
             this function should be deployed. Usually ``master`` or ``worker``.
         zone_env (string): content of ``network-split.env`` file with zone
             configuration, as created by
-            :py:meth:`ocp_network_split.zone.ZoneConfig.get_env_file`
+            :py:meth:`ocpnetsplit.zone.ZoneConfig.get_env_file`
 
     Returns:
         dict: MachineConfig dict

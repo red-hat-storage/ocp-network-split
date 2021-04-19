@@ -39,7 +39,7 @@ some zone, eg:
 There is no limitation on the design of cluster zones or their names
 (values of ``topology.kubernetes.io/zone`` label key). The ocp-network-split
 references zones under single letter names (such as ``a``, ``b`` ... see
-:py:const:`ocp_network_split.zone.VALID_ZONES`), so that you will just need to
+:py:const:`ocpnetsplit.zone.ZONES`), so that you will just need to
 create mapping between ocp-network-split names and actual zone names as shown
 in the following sections.
 
@@ -140,21 +140,21 @@ Python API
 ==========
 
 To use ocp-network-split in your python test script, see functions in module
-:py:mod:`ocp_network_split.main` which provides public API and implementation
+:py:mod:`ocpnetsplit.main` which provides public API and implementation
 of the command line tools referenced in the previous section.
 
 Quick high level overview of API usage:
 
 - Generate list of dictionaries representing content of ``MachineConfig`` yaml,
   (which contains network split script and unit files) using
-  :py:func:`ocp_network_split.main.get_zone_config` and
-  :py:func:`ocp_network_split.main.get_networksplit_mc_spec`.
+  :py:func:`ocpnetsplit.main.get_zone_config` and
+  :py:func:`ocpnetsplit.main.get_networksplit_mc_spec`.
 - Deploy the ``MachineConfig`` generated in the previous step and wait for the
   configuration to be applied on all nodes. This needs to be done only once.
 - Pick desired network split configuration from
-  :py:const:`ocp_network_split.zone.VALID_NETWORK_SPLITS`.
+  :py:const:`ocpnetsplit.zone.NETWORK_SPLITS`.
 - Schedule selected network split disruption via
-  :py:func:`ocp_network_split.main.schedule_split`, this will define 2 timers
+  :py:func:`ocpnetsplit.main.schedule_split`, this will define 2 timers
   on each node, one to start the disruption and another one to stop it.
 - Wait for the 1st timer to trigger setup of the network split.
 - Wait for the 2nd timer to trigger teardown, restoring the network

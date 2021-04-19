@@ -15,13 +15,13 @@
 # limitations under the License.
 
 
-VALID_ZONES = ("a", "b", "c", "x")
+ZONES = ("a", "b", "c", "x")
 """
 Stable zone identifiers as defined and used by ocp-network-split.
 """
 
 
-VALID_NETWORK_SPLITS = ("ab", "bc", "ab-bc", "ab-ac", "ax", "ax-bx-cx")
+NETWORK_SPLITS = ("ab", "bc", "ab-bc", "ab-ac", "ax", "ax-bx-cx")
 """
 Available network split configurations. For every valid network split value,
 there is a systemd timer unit named ``network-split-{split}-setup@.timer``.
@@ -43,10 +43,10 @@ class ZoneConfig:
         Add a node ip address into a zone.
 
         Args:
-            zone (str): zone identification (one of ``VALID_ZONES``)
+            zone (str): zone identification (one of ``ZONES``)
             node (str): ip address of a node
         """
-        if zone not in VALID_ZONES:
+        if zone not in ZONES:
             raise ValueError("Invalid zone name: {zone}")
         self._zones.setdefault(zone, set()).add(node)
 
@@ -55,7 +55,7 @@ class ZoneConfig:
         Add list of node ip addresses into a zone.
 
         Args:
-            zone (str): zone identification (one of ``VALID_ZONES``)
+            zone (str): zone identification (one of ``ZONES``)
             nodes (list): list of string representation of node ip addresses
         """
         for node in nodes:
@@ -66,7 +66,7 @@ class ZoneConfig:
         Return set of node ip addresses in given zone.
 
         Args:
-            zone (str): zone identification (one of ``VALID_ZONES``)
+            zone (str): zone identification (one of ``ZONES``)
 
         Returns:
             list: string representation of node ip addresses of given zone

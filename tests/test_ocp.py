@@ -6,7 +6,7 @@ import subprocess
 
 import pytest
 
-from ocp_network_split import ocp
+from ocpnetsplit import ocp
 
 
 def test_oc_run_positive():

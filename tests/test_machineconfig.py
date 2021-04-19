@@ -5,7 +5,7 @@ import textwrap
 
 import pytest
 
-from ocp_network_split import machineconfig
+from ocpnetsplit import machineconfig
 
 
 def test_create_file_dict_emptyname():

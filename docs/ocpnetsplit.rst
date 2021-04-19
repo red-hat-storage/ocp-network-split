@@ -1,34 +1,34 @@
-ocp\_network\_split package
+ocpnetsplit package
 ===========================
 
-ocp\_network\_split.machineconfig module
+ocpnetsplit.machineconfig module
 ----------------------------------------
 
-.. automodule:: ocp_network_split.machineconfig
+.. automodule:: ocpnetsplit.machineconfig
    :members:
    :undoc-members:
    :show-inheritance:
 
-ocp\_network\_split.main module
+ocpnetsplit.main module
 -------------------------------
 
-.. automodule:: ocp_network_split.main
+.. automodule:: ocpnetsplit.main
    :members:
    :undoc-members:
    :show-inheritance:
 
-ocp\_network\_split.ocp module
+ocpnetsplit.ocp module
 ------------------------------
 
-.. automodule:: ocp_network_split.ocp
+.. automodule:: ocpnetsplit.ocp
    :members:
    :undoc-members:
    :show-inheritance:
 
-ocp\_network\_split.zone module
+ocpnetsplit.zone module
 -------------------------------
 
-.. automodule:: ocp_network_split.zone
+.. automodule:: ocpnetsplit.zone
    :members:
    :undoc-members:
    :show-inheritance:

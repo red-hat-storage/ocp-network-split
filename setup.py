@@ -45,8 +45,8 @@ setup(
     include_package_data=True,
     entry_points={
         'console_scripts': [
-            'ocp-network-split-setup=ocp_network_split.main:main_setup',
-            'ocp-network-split-sched=ocp_network_split.main:main_sched',
+            'ocp-network-split-setup=ocpnetsplit.main:main_setup',
+            'ocp-network-split-sched=ocpnetsplit.main:main_sched',
             ],
         },
     # https://packaging.python.org/specifications/core-metadata/#project-url-multiple-use

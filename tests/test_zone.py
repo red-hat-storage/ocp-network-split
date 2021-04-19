@@ -4,18 +4,18 @@ import textwrap
 
 import pytest
 
-from ocp_network_split import zone
+from ocpnetsplit import zone
 
 
 def test_valid_zone_splits():
     """
     Check that zone splits references valid zones.
     """
-    for split_config in zone.VALID_NETWORK_SPLITS:
+    for split_config in zone.NETWORK_SPLITS:
         for split in split_config.split("-"):
             assert len(split) == 2
-            assert split[0] in zone.VALID_ZONES
-            assert split[1] in zone.VALID_ZONES
+            assert split[0] in zone.ZONES
+            assert split[1] in zone.ZONES
 
 
 def test_zoneconfig_invalid_zone():
@@ -24,7 +24,7 @@ def test_zoneconfig_invalid_zone():
     """
     zc = zone.ZoneConfig()
     invalid_zone = "d"
-    assert invalid_zone not in zone.VALID_ZONES
+    assert invalid_zone not in zone.ZONES
     with pytest.raises(ValueError):
         zc.add_node(invalid_zone, "192.128.0.11")
 
