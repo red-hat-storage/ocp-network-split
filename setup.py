@@ -51,8 +51,8 @@ setup(
         },
     # https://packaging.python.org/specifications/core-metadata/#project-url-multiple-use
     project_urls={
-        # 'Documentation': 'TODO',
-        # 'Bug Reports': 'TODO',
+        'Documentation': 'https://mbukatov.gitlab.io/ocp-network-split',
+        'Bug Reports': 'https://gitlab.com/mbukatov/ocp-network-split/-/issues',
         'Source': 'https://gitlab.com/mbukatov/ocp-network-split/',
         },
     )

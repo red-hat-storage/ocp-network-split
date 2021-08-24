@@ -22,6 +22,15 @@ https://mbukatov.gitlab.io/ocp-network-split
 Source files of the documentation are maintained as a `Sphinx
 <https://www.sphinx-doc.org/en/master>`_ project in ``docs`` directory.
 
+Source code
+-----------
+
+Upstream: <https://gitlab.com/mbukatov/ocp-network-split>
+
+Mirrors:
+
+- <https://github.com/mbukatov/ocp-network-split>
+
 License
 -------
 
