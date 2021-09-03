@@ -140,7 +140,7 @@ def create_unit_dict(name, content):
     return unit_dict
 
 
-def create_mc_dict(role, zone_env):
+def create_split_mc_dict(role, zone_env):
     """
     Create ``MachineConfig`` dict with network-split systemd units and scripts.
 

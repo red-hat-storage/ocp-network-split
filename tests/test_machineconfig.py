@@ -75,18 +75,18 @@ def test_create_unit_dict_simplecontent():
     assert ud["enabled"] is True
 
 
-def test_create_mc_dict_metadata():
+def test_create_split_mc_dict_metadata():
     """
-    Check that create_mc_dict() fills up MachineConfig metadata properly.
+    Check that create_split_mc_dict() fills up MachineConfig metadata properly.
     """
-    mcd = machineconfig.create_mc_dict("worker", "")
+    mcd = machineconfig.create_split_mc_dict("worker", "")
     assert mcd["kind"] == "MachineConfig"
     assert mcd["metadata"]["name"] == "99-worker-network-split"
     role_label = "machineconfiguration.openshift.io/role"
     assert mcd["metadata"]["labels"][role_label] == "worker"
 
 
-def test_create_mc_dict_content():
+def test_create_split_mc_dict_content():
     """
     Create production like machineconfig dictionary and check the resulting
     MachineConfig dictionary.
@@ -98,7 +98,7 @@ def test_create_mc_dict_content():
         ZONE_C="10.1.161.115 10.1.160.192 10.1.160.174 10.1.160.208"
     """
     )
-    mcd = machineconfig.create_mc_dict("worker", zone_env)
+    mcd = machineconfig.create_split_mc_dict("worker", zone_env)
 
     # there are 2 files, one for firewall script, the other for the env file
     files = set(fl["path"] for fl in mcd["spec"]["config"]["storage"]["files"])

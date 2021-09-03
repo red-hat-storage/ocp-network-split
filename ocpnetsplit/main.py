@@ -80,7 +80,7 @@ def get_networksplit_mc_spec(zone_env):
     """
     mc_spec = []
     for role in "master", "worker":
-        mc_spec.append(machineconfig.create_mc_dict(role, zone_env))
+        mc_spec.append(machineconfig.create_split_mc_dict(role, zone_env))
     return mc_spec
 
 
