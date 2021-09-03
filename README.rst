@@ -25,11 +25,11 @@ Source files of the documentation are maintained as a `Sphinx
 Source code
 -----------
 
-Upstream: <https://gitlab.com/mbukatov/ocp-network-split>
+Upstream: https://gitlab.com/mbukatov/ocp-network-split
 
 Mirrors:
 
-- <https://github.com/mbukatov/ocp-network-split>
+- https://github.com/mbukatov/ocp-network-split
 
 License
 -------
