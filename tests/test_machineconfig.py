@@ -16,6 +16,27 @@ def test_create_file_dict_emptyname():
         machineconfig.create_file_dict(basename="", content="foobar")
 
 
+def test_create_file_dict_relativedir():
+    """
+    ValueError is raised when target_path is relative.
+    """
+    with pytest.raises(ValueError):
+        machineconfig.create_file_dict(
+            basename="foo", content="bar", target_dir="etc/ssh.d")
+
+
+def test_create_file_dict_wrongdir():
+    """
+    ValueError is raised when target_path is outside of MCO managed dirs.
+    """
+    with pytest.raises(ValueError):
+        machineconfig.create_file_dict(
+            basename="foo", content="bar", target_dir="/tmp")
+    with pytest.raises(ValueError):
+        machineconfig.create_file_dict(
+            basename="foo", content="bar", target_dir="/etc/../opt/")
+
+
 def test_create_unit_dict_emptyname():
     """
     ValueError is raised when unit name is empty.
@@ -30,6 +51,16 @@ def test_create_file_dict_simplecontent():
     """
     fd = machineconfig.create_file_dict("test.file", "hello world")
     assert fd["path"] == "/etc/test.file"
+    expected_source = "data:text/plain;charset=utf-8;base64,aGVsbG8gd29ybGQ="
+    assert fd["contents"]["source"] == expected_source
+
+
+def test_create_file_dict_simplecontent_targetdir():
+    """
+    Check that create_file_dict() fills out the dictionary properly.
+    """
+    fd = machineconfig.create_file_dict("test.conf", "hello world", "/etc/ssh")
+    assert fd["path"] == "/etc/ssh/test.conf"
     expected_source = "data:text/plain;charset=utf-8;base64,aGVsbG8gd29ybGQ="
     assert fd["contents"]["source"] == expected_source
 

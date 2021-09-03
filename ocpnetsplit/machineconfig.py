@@ -83,24 +83,35 @@ UNIT_SKEL = textwrap.dedent(
 )
 
 
-def create_file_dict(basename, content):
+def create_file_dict(basename, content, target_dir="/etc"):
     """
     Create Ignition config spec for given file basename and content, to be used
-    in a ``MachineConfig`` spec. Files will be always placed in ``/etc``
-    directory (MCO can only change files in ``/etc`` and ``/var`` directories).
+    in a ``MachineConfig`` spec. File will be placed given ``target_dir``, but
+    note that MCO can only change files in ``/etc`` and ``/var`` directories.
 
     Args:
         basename (str): basename of the file
         content (str): content of the file
+        target_dir (str): absolute path where to place the file, eg. ``/etc``
 
     Returns:
         dict: Ignition storage file config spec
+
+    Raises:
+        ValueError: if given ``basename`` or ``target_dir`` is invalid
     """
     if basename is None or len(basename) == 0:
         raise ValueError("basename should not be empty")
     file_dict = yaml.safe_load(FILE_SKEL)
     # MCO can deploy files to /etc and /var directories only
-    file_dict["path"] = os.path.join("/etc", basename)
+    if not target_dir.startswith("/"):
+        raise ValueError(
+            f"target_dir '{target_dir}' shouldn't be relative, use abs. path")
+    target_dir = os.path.normpath(target_dir)
+    if not (target_dir.startswith("/etc") or target_dir.startswith("/var")):
+        raise ValueError(
+            f"target_dir '{target_dir}' should not be outside of /etc or /var")
+    file_dict["path"] = os.path.join(target_dir, basename)
     # Ignition requires content of storage.file entry to be provided via an
     # URL and accepts rfc2397 "data" URL scheme.
     source_prefix = "data:text/plain;charset=utf-8;base64,"
