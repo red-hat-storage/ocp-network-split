@@ -65,7 +65,7 @@ def get_zone_config(zone_a, zone_b, zone_c, zone_x_addrs=None):
     return zc
 
 
-def get_networksplit_mc_spec(zone_env):
+def get_networksplit_mc_spec(zone_env=None, split=False, latency=0):
     """
     Create ``MachineConfig`` spec to install network split firewall tweaking
     script and unit files on all cluster nodes.
@@ -80,7 +80,12 @@ def get_networksplit_mc_spec(zone_env):
     """
     mc_spec = []
     for role in "master", "worker":
-        mc_spec.append(machineconfig.create_split_mc_dict(role, zone_env))
+        if zone_env is not None:
+            mc_spec.append(machineconfig.create_zone_mc_dict(role, zone_env))
+        if latency != 0:
+            mc_spec.append(machineconfig.create_latency_mc_dict(role, latency))
+        if split:
+            mc_spec.append(machineconfig.create_split_mc_dict(role))
     return mc_spec
 
 
@@ -209,6 +214,22 @@ def main_setup():
         metavar="IP_ADDRS",
         help="comma separated list of IP addresses of external services")
     ap.add_argument(
+        "--no-zone-env",
+        action="store_true",
+        default=False,
+        help="don't include zone env MachineConfig")
+    ap.add_argument(
+        "--no-split",
+        action="store_true",
+        default=False,
+        help="don't include netsplit MachineConfig")
+    ap.add_argument(
+        "--latency",
+        "-l",
+        default=0,
+        type=int,
+        help="network latency in ms to be created among zones")
+    ap.add_argument(
         "--debug",
         action="store_true",
         help="set log level to DEBUG")
@@ -222,15 +243,27 @@ def main_setup():
         addr_list = args.x_addrs.split(",")
     else:
         addr_list = None
-    zone_config = get_zone_config(args.a, args.b, args.c, addr_list)
-    zone_env = zone_config.get_env_file()
 
-    if args.print_env_only:
-        print(zone_env)
-        return
+    if args.no_zone_env:
+        zone_env = None
+        if args.print_env_only:
+            err_msg = (
+                "options --no-zone-env and --print-env-only can't be both "
+                "used at the same time")
+            print(err_msg, file=sys.stderr)
+            return 1
+    else:
+        zone_config = get_zone_config(args.a, args.b, args.c, addr_list)
+        zone_env = zone_config.get_env_file()
+        if args.print_env_only:
+            print(zone_env)
+            return
 
     # get MachineConfig spec (ready to deploy list of dics)
-    mc = get_networksplit_mc_spec(zone_env)
+    mc = get_networksplit_mc_spec(
+            zone_env,
+            split=(not args.no_split),
+            latency=args.latency)
     args.output.write(yaml.dump_all(mc))
 
 
