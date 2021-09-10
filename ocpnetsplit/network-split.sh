@@ -25,20 +25,6 @@ show_help()
   echo "Examples of valid splits: bc, ab, ab-bc, ab-ac, ax"
 }
 
-print_current_zone()
-{
-  for host_ip_addr in $(hostname -I); do
-    for zone_name in ZONE_{A,B,C}; do
-      for zone_host_ip_addr in ${!zone_name}; do
-        if [[ "${zone_host_ip_addr}" = "${host_ip_addr}" ]]; then
-          echo ${zone_name}
-          exit
-        fi
-      done
-    done
-  done
-}
-
 if [[ $# = 0 ]]; then
   show_help
   exit
@@ -63,35 +49,15 @@ case $1 in
   *)         show_help; exit 1
 esac
 
-# make sure expected zone env. variables are present, log their values
-ERROR=0
-for env_var in ZONE_A ZONE_B ZONE_C; do
-  if [[ ! -v ${env_var} ]]; then
-    echo "environment variable ${env_var} is not defined"
-    ERROR=1
-  else
-    echo "$env_var=\"${!env_var}\""
-  fi
-done
-# external zone x is optional
-if [[ -v ZONE_X ]]; then
-  echo "ZONE_X=\"${ZONE_X}\""
-fi
-if [[ $ERROR -eq 1 ]]; then
-  exit 2
+# check zone configuration and detect current zone (we are running inside)
+script_dir=$(realpath "$(dirname "$0")")
+if ! current_zone=$("${script_dir}"/network-zone.sh); then
+  echo "zone configuration is invalid, script can't continue"
+  exit 1
 fi
 
-# find out zone we are running in
-current_zone=$(print_current_zone)
-
-# report if we are actually running in one of the zones
-if [[ -v ${current_zone} ]]; then
-  echo "current zone: $current_zone"
-else
-  echo "current node doesn't belong to any zone, script can't continue"
-  echo "output of 'hostname -I' command: $(hostname -I)"
-  exit 3
-fi
+# report current zone
+echo "current zone: $current_zone"
 
 # load network split specification from command line
 net_split_spec=${1//-/ }
