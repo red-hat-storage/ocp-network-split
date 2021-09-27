@@ -100,9 +100,13 @@ def test_create_zone_mc_dict_content():
     )
     mcd = machineconfig.create_zone_mc_dict("worker", zone_env)
 
-    # there is a network zone env file
-    assert len(mcd["spec"]["config"]["storage"]["files"]) == 1
-    assert mcd["spec"]["config"]["storage"]["files"][0]["path"] == "/etc/network-split.env"
+    # there is a network zone env file along with the zone helper script
+    assert len(mcd["spec"]["config"]["storage"]["files"]) == 2
+    file_path_list = []
+    for file in mcd["spec"]["config"]["storage"]["files"]:
+        file_path_list.append(file["path"])
+    assert "/etc/network-split.env" in file_path_list
+    assert "/etc/network-zone.sh" in file_path_list
 
     # there is no systemd section in the machineconfig
     assert "systemd" not in mcd["spec"]["config"]
@@ -119,9 +123,13 @@ def test_create_split_mc_dict_content():
     assert len(mcd["spec"]["config"]["storage"]["files"]) == 1
     assert mcd["spec"]["config"]["storage"]["files"][0]["path"] == "/etc/network-split.sh"
 
-    # there is systemd unit attached for each systemd unit file
+    # there is systemd unit attached for each systemd unit file with
+    # network-split prefix
     units = set(un["name"] for un in mcd["spec"]["config"]["systemd"]["units"])
-    unit_files = set(os.listdir(os.path.join(machineconfig.HERE, "systemd")))
+    unit_files = set()
+    for unit_file in os.listdir(os.path.join(machineconfig.HERE, "systemd")):
+        if unit_file.startswith("network-split"):
+            unit_files.add(unit_file)
     assert units == unit_files
 
 
@@ -134,5 +142,12 @@ def test_create_latency_mc_dict_content():
 
     # there is a network split script
     file_list = mcd["spec"]["config"]["storage"]["files"]
-    assert len(file_list) == 1
-    assert file_list[0]["path"] == "/etc/modules-load.d/sch_netem.conf"
+    assert len(file_list) == 2
+    file_paths = []
+    for file in file_list:
+        file_paths.append(file["path"])
+    assert "/etc/modules-load.d/sch_netem.conf" in file_paths
+    assert "/etc/network-latency.sh" in file_paths
+
+    # there is one systemd unit
+    assert len(mcd["spec"]["config"]["systemd"]["units"]) == 1

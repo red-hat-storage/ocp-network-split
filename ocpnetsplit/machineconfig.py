@@ -38,6 +38,7 @@ import yaml
 
 
 HERE = os.path.abspath(os.path.dirname(__file__))
+SYSTEMD_DIR = os.path.join(HERE, "systemd")
 
 
 MACHINECONFIG_SKELL = textwrap.dedent(
@@ -154,6 +155,38 @@ def get_new_mc(role, name_suffix, priority=99):
     return mcd
 
 
+def create_script_dict(script_name):
+    """
+    Create file dict with given shell script from ocpnetsplit module.
+
+    Args:
+        script_name (string): name of the shell script
+
+    Returns:
+        dict: Ignition storage file config spec
+    """
+    with open(os.path.join(HERE, script_name), "r") as script_file:
+        script_dict = create_file_dict(script_name, script_file.read())
+        # the script needs to be executable
+        script_dict["mode"] = 0o544
+    return script_dict
+
+
+def create_systemdunit_dict(unit_filename):
+    """
+    Create file dict with given systemd unit file from ocpnetsplit module.
+
+    Args:
+        unit_filename (string): name of the systemd unit file
+
+    Returns:
+        dict: Ignition storage file config spec
+    """
+    with open(os.path.join(SYSTEMD_DIR, unit_filename), "r") as unit_file:
+        unit_dict = create_unit_dict(unit_filename, unit_file.read())
+    return unit_dict
+
+
 def create_zone_mc_dict(role, zone_env):
     """
     Create ``MachineConfig`` dict with network zone config env file.
@@ -174,6 +207,10 @@ def create_zone_mc_dict(role, zone_env):
     # add env file with zone configuration
     env_dict = create_file_dict("network-split.env", zone_env)
     mcd["spec"]["config"]["storage"]["files"].append(env_dict)
+
+    # include zone checking and detection script file
+    script_dict = create_script_dict("network-zone.sh")
+    mcd["spec"]["config"]["storage"]["files"].append(script_dict)
 
     # drop systemd section, which is not necessary in this case
     del mcd["spec"]["config"]["systemd"]
@@ -196,18 +233,15 @@ def create_split_mc_dict(role):
     mcd = get_new_mc(role, "network-split")
 
     # include firewall script file
-    with open(os.path.join(HERE, "network-split.sh"), "r") as script_file:
-        script_dict = create_file_dict("network-split.sh", script_file.read())
-        # the script needs to be executable
-        script_dict["mode"] = 0o544
-        mcd["spec"]["config"]["storage"]["files"].append(script_dict)
+    script_dict = create_script_dict("network-split.sh")
+    mcd["spec"]["config"]["storage"]["files"].append(script_dict)
 
     # and include all systemd units from systemd directory
-    systemd_dir = os.path.join(HERE, "systemd")
-    for unit_filename in os.listdir(systemd_dir):
-        with open(os.path.join(systemd_dir, unit_filename), "r") as unit_file:
-            unit_dict = create_unit_dict(unit_filename, unit_file.read())
-            mcd["spec"]["config"]["systemd"]["units"].append(unit_dict)
+    for unit_filename in os.listdir(SYSTEMD_DIR):
+        if not unit_filename.startswith("network-split"):
+            continue
+        unit_dict = create_systemdunit_dict(unit_filename)
+        mcd["spec"]["config"]["systemd"]["units"].append(unit_dict)
 
     return mcd
 
@@ -228,12 +262,18 @@ def create_latency_mc_dict(role, latency):
     mcd = get_new_mc(role, "network-latency")
 
     # include a config file to modprobe sch_netem kernel module
-    script_dict = create_file_dict(
+    file_dict = create_file_dict(
             "sch_netem.conf",
             "sch_netem",
             target_dir="/etc/modules-load.d")
+    mcd["spec"]["config"]["storage"]["files"].append(file_dict)
+
+    # include latency script file
+    script_dict = create_script_dict("network-latency.sh")
     mcd["spec"]["config"]["storage"]["files"].append(script_dict)
 
-    # TODO: include latency script and systemd unit service
+    # include systemd unit service for the latency script
+    unit_dict = create_systemdunit_dict("network-latency.service")
+    mcd["spec"]["config"]["systemd"]["units"].append(unit_dict)
 
     return mcd
