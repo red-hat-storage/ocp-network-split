@@ -1,7 +1,7 @@
-.. _overview:
+.. _overview_netsplit:
 
-Overview of the approach
-========================
+Overview of the network split approach
+======================================
 
 A quick overview of what and how opc-network-split does to block network
 traffic between cluster zones.
