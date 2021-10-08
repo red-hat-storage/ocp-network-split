@@ -32,4 +32,4 @@ Indices and tables
 
 .. _`k8s zones`: https://kubernetes.io/docs/reference/labels-annotations-taints/#topologykubernetesiozone
 .. _`k8s label`: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
-.. _`OpenShift 4`: https://docs.openshift.com/container-platform/4.7/welcome/index.html
+.. _`OpenShift 4`: https://docs.openshift.com/container-platform/4.8/welcome/index.html
