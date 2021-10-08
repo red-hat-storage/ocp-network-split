@@ -14,7 +14,7 @@ shellcheck:
   image: quay.io/mbukatov/mbukatov-fedora-shellcheck
   stage: lint
   script:
-    - shellcheck ocpnetsplit/network-split.sh
+    - shellcheck ocpnetsplit/*.sh
 
 py37:
   image: python:3.7

@@ -1,0 +1,15 @@
+[Unit]
+Description=Linux Traffic Control enforced network latency setup
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+Restart=no
+ExecStart=/usr/bin/bash -c "/etc/network-latency.sh LATENCY_VALUE"
+EnvironmentFile=/etc/network-split.env
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target
