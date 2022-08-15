@@ -11,3 +11,6 @@ tmp
 .tox
 .cache
 .pytest_cache
+venv
+*.yaml
+*.ini
