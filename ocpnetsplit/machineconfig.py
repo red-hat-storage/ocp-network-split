@@ -276,7 +276,7 @@ def create_latency_mc_dict(role, latency):
     unit_dict = create_systemdunit_dict("network-latency.service")
     # hardcode the given latency value into systemd service unit
     unit_dict["contents"] = unit_dict["contents"].replace(
-        "LATENCY_VALUE", str(latency))
+        "{{ latency }}", str(latency))
     mcd["spec"]["config"]["systemd"]["units"].append(unit_dict)
 
     return mcd

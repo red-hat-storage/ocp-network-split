@@ -1,0 +1,106 @@
+---
+- name: core netsplit setup
+  hosts: all
+  remote_user: root
+  vars:
+    env_file: network-split.env
+  tags:
+    - netsplit
+  handlers:
+    - name: daemon-reload
+      ansible.builtin.systemd:
+        daemon_reload: yes
+  tasks:
+
+    - name: Install dependencies for netsplit setup
+      dnf:
+        name: iptables
+        state: present
+
+    - name: Copy network-split.env file
+      copy:
+        src: "{{ env_file }}"
+        dest: "/etc/network-split.env"
+        owner: root
+        group: root
+      tags:
+      - env-file
+
+    - name: Copy netsplit scripts
+      copy:
+        src: "ocpnetsplit/{{ item }}"
+        dest: "/etc/{{ item }}"
+        owner: root
+        group: root
+        mode: 0544
+      with_items:
+      - network-zone.sh
+      - network-split.sh
+
+    - name: Copy netsplit unit files
+      copy:
+        src: "ocpnetsplit/systemd/{{ item }}"
+        dest: "/etc/systemd/system/{{ item }}"
+        owner: root
+        group: root
+      with_items:
+      - network-split-ab-ac-setup@.timer
+      - network-split-ab-bc-setup@.timer
+      - network-split-ab-setup@.timer
+      - network-split-ax-bx-cx-setup@.timer
+      - network-split-ax-setup@.timer
+      - network-split-bc-setup@.timer
+      - network-split@.service
+      - network-split-teardown.service
+      - network-split-teardown@.timer
+      notify:
+      - daemon-reload
+
+- name: latency setup
+  hosts: all
+  remote_user: root
+  vars:
+    latency: 5
+  tags:
+    - latency
+  handlers:
+    - name: daemon-reload
+      ansible.builtin.systemd:
+        daemon_reload: yes
+  tasks:
+
+    - name: Install tc dependencies for latency setup
+      dnf:
+        name:
+          - iproute-tc
+          - kernel-modules-extra
+        state: present
+
+    - name: Add sch_netem into modules-load.d
+      ansible.builtin.copy:
+        dest: "/etc/modules-load.d/sch_netem.conf"
+        content: "sch_netem"
+        owner: root
+        group: root
+
+    - name: Modprobe sch_netem module
+      community.general.modprobe:
+        name: sch_netem
+        state: present
+
+    - name: Copy latency script
+      copy:
+        src: "ocpnetsplit/network-latency.sh"
+        dest: "/etc/network-latency.sh"
+        owner: root
+        group: root
+        mode: 0544
+
+    - name: Copy latency unit file
+      ansible.builtin.template:
+        src: "ocpnetsplit/systemd/network-latency.service"
+        dest: "/etc/systemd/system/network-latency.service"
+        owner: root
+        group: root
+      notify:
+      - daemon-reload

@@ -6,7 +6,7 @@ Wants=network-online.target
 [Service]
 Type=oneshot
 Restart=no
-ExecStart=/usr/bin/bash -c "/etc/network-latency.sh LATENCY_VALUE"
+ExecStart=/usr/bin/bash -c "/etc/network-latency.sh {{ latency }}"
 EnvironmentFile=/etc/network-split.env
 User=root
 Group=root
