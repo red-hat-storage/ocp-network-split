@@ -46,6 +46,7 @@ setup(
     entry_points={
         'console_scripts': [
             'ocp-network-split-setup=ocpnetsplit.main:main_setup',
+            'ocp-network-split-multisetup=ocpnetsplit.main:main_multisetup',
             'ocp-network-split-sched=ocpnetsplit.main:main_sched',
             ],
         },

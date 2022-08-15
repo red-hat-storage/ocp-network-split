@@ -23,7 +23,9 @@ use the python functions defined here directly.
 
 from datetime import datetime, timedelta
 import argparse
+import configparser
 import logging
+import socket
 import sys
 
 import yaml
@@ -62,6 +64,21 @@ def get_zone_config(zone_a, zone_b, zone_c, zone_x_addrs=None):
             zc.add_nodes(zone_name, ocp.get_all_node_ip_addrs(node))
     if zone_x_addrs is not None:
         zc.add_nodes("x", zone_x_addrs)
+    return zc
+
+
+def get_zone_config_fromfile(file_content):
+    """
+    Get zone config from ini file, which contains node fqdn entries for each
+    zone.
+    """
+    config = configparser.ConfigParser(allow_no_value=True)
+    config.read_string(file_content)
+    zc = zone.ZoneConfig()
+    for zone_name in zone.ZONES:
+        for host_name in config[zone_name]:
+            host_ipaddr = socket.gethostbyname(host_name)
+            zc.add_node(zone_name, host_ipaddr)
     return zc
 
 
@@ -265,6 +282,68 @@ def main_setup():
             split=(not args.no_split),
             latency=args.latency)
     args.output.write(yaml.dump_all(mc))
+
+
+def main_multisetup():
+    """
+    Simple multi cluster version of command line interface to generate
+    MachineConfig yaml and env file to deploy on OCP/Ceph clusters.
+
+    Example usage::
+
+        $ ocp-network-split-multisetup zones.ini --mc mc.yaml --env network-split.env
+
+    """
+    ap = argparse.ArgumentParser(
+            description="multi cluster network split setup helper")
+    ap.add_argument(
+        "zonefile",
+        type=argparse.FileType("r"),
+        help="ini file with list of node fqdn for each zone a, b and c")
+    ap.add_argument(
+        "--mc",
+        metavar="FILE",
+        required=True,
+        type=argparse.FileType("w"),
+        help="name of an output yaml file with MachineConfig entries")
+    ap.add_argument(
+        "--env",
+        metavar="FILE",
+        default=sys.stdout,
+        type=argparse.FileType("w"),
+        help="name of an output env file with zone configuration")
+    ap.add_argument(
+        "--no-split",
+        action="store_true",
+        default=False,
+        help="don't include netsplit MachineConfig")
+    ap.add_argument(
+        "--latency",
+        "-l",
+        default=0,
+        type=int,
+        help="network latency in ms to be created among zones")
+    ap.add_argument(
+        "--debug",
+        action="store_true",
+        help="set log level to DEBUG")
+    args = ap.parse_args()
+
+    if args.debug:
+        logging.basicConfig(level=logging.DEBUG)
+
+    # get zoneconfig from the ansible inventory like ini file
+    zone_config = get_zone_config_fromfile(args.zonefile.read())
+    zone_env = zone_config.get_env_file()
+    # save separate zoneconfig (for ansible deployment later)
+    args.env.write(zone_env)
+
+    # get MachineConfig spec (ready to deploy list of dics)
+    mc = get_networksplit_mc_spec(
+            zone_env,
+            split=(not args.no_split),
+            latency=args.latency)
+    args.mc.write(yaml.dump_all(mc))
 
 
 def main_sched():
