@@ -104,3 +104,9 @@
         group: root
       notify:
       - daemon-reload
+
+    - name: Start and enable the latency service
+      ansible.builtin.systemd:
+        name: network-latency
+        enabled: true
+        state: started
