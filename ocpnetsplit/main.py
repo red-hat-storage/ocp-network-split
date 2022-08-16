@@ -26,6 +26,7 @@ import argparse
 import configparser
 import logging
 import socket
+import subprocess
 import sys
 
 import yaml
@@ -36,6 +37,43 @@ from ocpnetsplit import zone
 
 
 LOGGER = logging.getLogger(name=__file__)
+
+
+def run_ssh_node(cmd_list, node, timeout=600):
+    """
+    Run given command on given node via ssh assuming connection details like
+    username and keys are specified via ~/.ssh/config file.
+
+    Args:
+        cmd_list (list): a command to run, eg. ``["uname", "-a"]`` will
+            execute ``uname -a`` process on the node
+        node (str): hostname of k8s node where to execute the command
+        timeout (int): command timeout specified in seconds, optional
+
+    Returns:
+        tuple: ssh stdout, ssh souterr
+    """
+    # using sudo in all cases, we don't need to care if we are connecting to
+    # the node as root or coreos user
+    ssh_cmd = ["ssh", node, "sudo"] + cmd_list
+    LOGGER.info("going to execute %s", ssh_cmd)
+    comp_proc = subprocess.run(
+        ssh_cmd,
+        capture_output=True,
+        timeout=timeout)
+    # log whole output of the process
+    proc_log_level = logging.DEBUG
+    if comp_proc.returncode > 0:
+        proc_log_level = logging.WARNING
+    LOGGER.log(proc_log_level, "ssh stdout: %s", comp_proc.stdout)
+    LOGGER.log(proc_log_level, "ssh stderr: %s", comp_proc.stderr)
+    LOGGER.log(proc_log_level, "ssh return code: %d", comp_proc.returncode)
+    # after the logging is done, we can raise the exception if necessary
+    comp_proc.check_returncode()
+    # if all is ok, let's return output
+    ssh_stdout = comp_proc.stdout.decode()
+    ssh_stderr = comp_proc.stderr.decode()
+    return ssh_stdout, ssh_stderr
 
 
 def get_zone_config(zone_a, zone_b, zone_c, zone_x_addrs=None):
@@ -67,7 +105,7 @@ def get_zone_config(zone_a, zone_b, zone_c, zone_x_addrs=None):
     return zc
 
 
-def get_zone_config_fromfile(file_content):
+def get_zone_config_fromfile(file_content, translate_hostname=True):
     """
     Get zone config from ini file, which contains node fqdn entries for each
     zone.
@@ -77,8 +115,11 @@ def get_zone_config_fromfile(file_content):
     zc = zone.ZoneConfig()
     for zone_name in zone.ZONES:
         for host_name in config[zone_name]:
-            host_ipaddr = socket.gethostbyname(host_name)
-            zc.add_node(zone_name, host_ipaddr)
+            if translate_hostname:
+                host = socket.gethostbyname(host_name)
+            else:
+                host = host_name
+            zc.add_node(zone_name, host)
     return zc
 
 
@@ -106,17 +147,20 @@ def get_networksplit_mc_spec(zone_env=None, split=False, latency=0):
     return mc_spec
 
 
-def schedule_split(split_name, target_dt, target_length):
+def schedule_split(nodes, split_name, target_dt, target_length, use_ssh=False):
     """
     Schedule start and stop of network split on all nodes of the cluster.
 
     Args:
+        nodes (list): list of all nodes from all zones
         split_name (str): network split configuration specification, eg.
             ``ab``, see
             :py:const:`ocpnetsplit.zone.NETWORK_SPLITS` constant
         target_dt (datetime): requested start time of the network split
         target_length (int): number of minutes specifying how long the network
             split configuration should be active
+        use_ssh (bool): if true, connect to the nodes via ssh; use oc debug
+            node otherwise
 
     Raises:
         ValueError: in case invalid ``split_name`` or ``target_dt`` is
@@ -143,20 +187,26 @@ def schedule_split(split_name, target_dt, target_length):
     start_unit = f"network-split-{split_name}-setup@{start_ts}.timer"
     stop_unit = f"network-split-teardown@{stop_ts}.timer"
     # schedule both timers on every node of the cluster
-    for node in ocp.list_cluster_nodes():
+    for node in nodes:
         cmd_list = ["systemctl", "start",  start_unit, stop_unit]
-        ocp.run_oc_debug_node(cmd_list, node)
+        if use_ssh:
+            run_ssh_node(cmd_list, node)
+        else:
+            ocp.run_oc_debug_node(cmd_list, node)
 
 
-def check_split(split_name):
+def check_split(nodes, split_name, use_ssh=False):
     """
     Checks status of split via ``systemctl list-timers`` on all nodes of the
     cluster.
 
     Args:
+        nodes (list): list of all nodes from all zones
         split_name (str): network split configuration specification, eg.
             ``ab``, see :py:const:`ocpnetsplit.zone.NETWORK_SPLITS`
             constant
+        use_ssh (bool): if true, connect to the nodes via ssh; use oc debug
+            node otherwise
 
     Raises:
         ValueError: when invalid ``split_name`` is specified
@@ -167,10 +217,13 @@ def check_split(split_name):
     # generate systemd timer unit pattern for list-timers
     start_unit_pattern = f"network-split-{split_name}-setup*"
     # check status of start timer on every node of the cluster
-    for node in ocp.list_cluster_nodes():
+    for node in nodes:
         print(node)
         cmd_list = ["systemctl", "list-timers", start_unit_pattern]
-        stdout, _ = ocp.run_oc_debug_node(cmd_list, node)
+        if use_ssh:
+            stdout, _ = run_ssh_node(cmd_list, node)
+        else:
+            stdout, _ = ocp.run_oc_debug_node(cmd_list, node)
         for line in stdout.splitlines():
             if line.startswith("Pass --all to see"):
                 continue
@@ -371,6 +424,11 @@ def main_sched():
         type=int,
         help="how long the network split should take (in minutes)")
     ap.add_argument(
+        "--zonefile",
+        type=argparse.FileType("r"),
+        help=("ini file with list of node fqdn for each zone, "
+              "will use ssh instead of `oc debug` when specified"))
+    ap.add_argument(
         "-d",
         "--debug",
         action="store_true",
@@ -380,8 +438,18 @@ def main_sched():
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
 
+    # get list of all nodes (across all zones)
+    if args.zonefile is not None:
+        zone_config = get_zone_config_fromfile(
+                args.zonefile.read(), translate_hostname=False)
+        nodes = zone_config.get_nodes()
+        use_ssh = True
+    else:
+        nodes = ocp.list_cluster_nodes()
+        use_ssh = False
+
     if args.timestamp is None:
-        check_split(args.split_name)
+        check_split(nodes, args.split_name, use_ssh)
         return
 
     try:
@@ -389,4 +457,5 @@ def main_sched():
     except ValueError as ex:
         print(ex)
         return 1
-    schedule_split(args.split_name, start_dt, args.split_len)
+
+    schedule_split(nodes, args.split_name, start_dt, args.split_len, use_ssh)

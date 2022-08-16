@@ -61,17 +61,24 @@ class ZoneConfig:
         for node in nodes:
             self.add_node(zone, node)
 
-    def get_nodes(self, zone):
+    def get_nodes(self, zone=None):
         """
         Return set of node ip addresses in given zone.
 
         Args:
-            zone (str): zone identification (one of ``ZONES``)
+            zone (str): zone identification (one of ``ZONES``), if not
+            specified, zone filtering is not applied and all nodes will be
+            returned
 
         Returns:
             list: string representation of node ip addresses of given zone
         """
-        return self._zones.get(zone)
+        if zone is not None:
+            return self._zones.get(zone)
+        nodes = []
+        for zone in self._zones.keys():
+            nodes += self._zones.get(zone)
+        return nodes
 
     def get_env_file(self):
         """
