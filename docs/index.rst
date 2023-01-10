@@ -3,13 +3,18 @@
 =========================
 
 This simple project provides functionality to block (and unblock) network
-traffic between `k8s zones`_ of an `OpenShift 4`_ cluster and to optionally
-create additional network latency among all zones of the cluster. It's intended
-to be used for *testing purposes* only.
+traffic between `OpenShift 4`_ cluster zones and to optionally create
+additional network latency among all zones. It's intended to be used for
+*testing purposes* only.
 
-Zone isolation is implemented by updating firewall rules on all RHEL CoreOS
-nodes of the cluster, while latency is introduced by setting up netem qdisc
-traffic queue on all nodes.
+This tool can be used either in *single cluster* or *multi cluster* mode.
+In a *single cluster* mode, the tool works on top of `k8s zones`_ defined in a
+particular `OpenShift 4`_ cluster. While in a *multi cluster* mode, zones are
+defined in a custom config file so that one zone can contain multiple OpenShift
+clusters or even other nodes.
+
+Zone isolation is implemented by updating firewall rules on all nodes, while
+latency is introduced by setting up netem qdisc traffic queue on all nodes.
 
 This is useful when you need to separate network between given zones, without
 affecting other traffic and with no assumptions about networking configuration
@@ -36,5 +41,4 @@ Indices and tables
 * :ref:`search`
 
 .. _`k8s zones`: https://kubernetes.io/docs/reference/labels-annotations-taints/#topologykubernetesiozone
-.. _`k8s label`: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
-.. _`OpenShift 4`: https://docs.openshift.com/container-platform/4.8/welcome/index.html
+.. _`OpenShift 4`: https://docs.openshift.com/container-platform/latest/welcome/index.html

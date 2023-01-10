@@ -148,3 +148,10 @@ References:
 - `Post-installation machine configuration tasks <https://docs.openshift.com/container-platform/4.6/post_installation_configuration/machine-configuration-tasks.html#using-machineconfigs-to-change-machines>`_
 - `machine-config-operator docs <https://github.com/openshift/machine-config-operator/tree/master/docs>`_
 - `Ignition Configuration Specification v3.1.0 <https://coreos.github.io/ignition/configuration-v3_1/>`_
+
+Ansible Playbook
+----------------
+
+In *multi cluster* mode, ``multisetup-playbook.yml`` ansible playbook is used
+to deploy the scripts and systemd unit files mentioned above to any RHEL
+machines which not part of any OpenShift cluster but are are part of any zone.

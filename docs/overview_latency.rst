@@ -59,7 +59,8 @@ whether and how was the latency reconfigured on a given node.
 MachineConfig
 -------------
 
-A MachineConfig resource is used to deploy both the script and systemd service
+In a *single cluster* mode,
+a MachineConfig resource is used to deploy both the script and systemd service
 unit file on each node of OpenShift cluster.
 
 Using openshift interface has an advantage of better visibility of such
@@ -67,8 +68,20 @@ changes, which can be easily inspected via machine config operator (MCO) API.
 Moreover the latency setup would survive a node reboot (assuming ip address of
 the node don't change).
 
-Example
--------
+Ansible Playbook
+----------------
+
+In a *multi cluster* mode, ``multisetup-playbook.yml`` ansible playbook is used
+to deploy the latency script and systemd service to machines which are part of
+a zone but outside of any OpenShift cluster.
+
+If *multi cluster* zones contain both OpenShift nodes and classic RHEL
+machines not part of any OpenShift cluster, one needs to use both MachineConfig
+and ansible playbook setup so that the latency service is deployed and running
+on all nodes of all zones.
+
+Single Cluster Example
+----------------------
 
 This example assumes we deployed network latency MachineConfig, and the
 OpenShift cluster have already applied the configuration on all it's nodes.
