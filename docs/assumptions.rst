@@ -5,6 +5,8 @@ Assumptions and limitations
 
 We assume that all nodes are using static IPv4 addresses.
 
+A node can be member of only one zone.
+
 Single cluster mode
 -------------------
 

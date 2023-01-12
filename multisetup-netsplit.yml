@@ -9,7 +9,7 @@
   handlers:
     - name: daemon-reload
       ansible.builtin.systemd:
-        daemon_reload: yes
+        daemon_reload: true
   tasks:
 
     - name: Install dependencies for netsplit setup
@@ -55,58 +55,3 @@
       - network-split-teardown@.timer
       notify:
       - daemon-reload
-
-- name: latency setup
-  hosts: all
-  remote_user: root
-  vars:
-    latency: 5
-  tags:
-    - latency
-  handlers:
-    - name: daemon-reload
-      ansible.builtin.systemd:
-        daemon_reload: yes
-  tasks:
-
-    - name: Install tc dependencies for latency setup
-      dnf:
-        name:
-          - iproute-tc
-          - kernel-modules-extra
-        state: present
-
-    - name: Add sch_netem into modules-load.d
-      ansible.builtin.copy:
-        dest: "/etc/modules-load.d/sch_netem.conf"
-        content: "sch_netem"
-        owner: root
-        group: root
-
-    - name: Modprobe sch_netem module
-      community.general.modprobe:
-        name: sch_netem
-        state: present
-
-    - name: Copy latency script
-      copy:
-        src: "ocpnetsplit/network-latency.sh"
-        dest: "/etc/network-latency.sh"
-        owner: root
-        group: root
-        mode: 0544
-
-    - name: Copy latency unit file
-      ansible.builtin.template:
-        src: "ocpnetsplit/systemd/network-latency.service"
-        dest: "/etc/systemd/system/network-latency.service"
-        owner: root
-        group: root
-      notify:
-      - daemon-reload
-
-    - name: Start and enable the latency service
-      ansible.builtin.systemd:
-        name: network-latency
-        enabled: true
-        state: started

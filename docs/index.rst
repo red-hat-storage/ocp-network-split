@@ -9,7 +9,7 @@ additional network latency among all zones. It's intended to be used for
 
 This tool can be used either in *single cluster* or *multi cluster* mode.
 In a *single cluster* mode, the tool works on top of `k8s zones`_ defined in a
-particular `OpenShift 4`_ cluster. While in a *multi cluster* mode, zones are
+particular `OpenShift 4`_ cluster. While in *multi cluster* mode, zones are
 defined in a custom config file so that one zone can contain multiple OpenShift
 clusters or even other nodes.
 

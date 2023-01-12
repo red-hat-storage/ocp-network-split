@@ -152,6 +152,11 @@ References:
 Ansible Playbook
 ----------------
 
-In *multi cluster* mode, ``multisetup-playbook.yml`` ansible playbook is used
-to deploy the scripts and systemd unit files mentioned above to any RHEL
-machines which not part of any OpenShift cluster but are are part of any zone.
+In *multi cluster* mode, ansible playbook ``multisetup-netsplit.yml`` is used
+to deploy the scripts and systemd unit files mentioned above
+to RHEL machines which are part of a zone but outside of any OpenShift cluster.
+
+If *multi cluster* zones contain both OpenShift nodes and classic RHEL
+machines outside of any OpenShift cluster, one needs to use both MachineConfig
+and ansible playbook setup so that the network split scripts are deployed
+on all nodes of all zones.

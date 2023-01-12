@@ -71,12 +71,12 @@ the node don't change).
 Ansible Playbook
 ----------------
 
-In a *multi cluster* mode, ``multisetup-playbook.yml`` ansible playbook is used
-to deploy the latency script and systemd service to machines which are part of
-a zone but outside of any OpenShift cluster.
+In *multi cluster* mode ansible playbook ``multisetup-latency.yml`` is used
+to deploy the latency script and systemd service to RHEL machines which are
+part of a zone but outside of any OpenShift cluster.
 
 If *multi cluster* zones contain both OpenShift nodes and classic RHEL
-machines not part of any OpenShift cluster, one needs to use both MachineConfig
+machines outside of any OpenShift cluster, one needs to use both MachineConfig
 and ansible playbook setup so that the latency service is deployed and running
 on all nodes of all zones.
 
