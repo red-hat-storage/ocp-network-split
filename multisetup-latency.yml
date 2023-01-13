@@ -2,8 +2,6 @@
 - name: latency setup
   hosts: all
   remote_user: root
-  vars:
-    latency: 5
   tags:
     - latency
   handlers:
@@ -11,6 +9,16 @@
       ansible.builtin.systemd:
         daemon_reload: true
   tasks:
+
+    - name: Check that network latency is specified
+      assert:
+        that:
+          - latency is defined
+          - latency | int | string == latency
+        fail_msg: "you need to define latency variable as one way connection delay in seconds"
+
+    - debug:
+        var: latency
 
     - name: Install tc dependencies for latency setup
       dnf:
