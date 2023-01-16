@@ -30,6 +30,7 @@ zones).
    overview_netsplit.rst
    overview_latency.rst
    usage.rst
+   usage_multicluster.rst
    modules.rst
 
 
