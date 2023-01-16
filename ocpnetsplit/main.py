@@ -170,6 +170,14 @@ def schedule_split(nodes, split_name, target_dt, target_length, use_ssh=False):
     if split_name not in zone.NETWORK_SPLITS:
         raise ValueError(f"invalid split_name specified: '{split_name}'")
     now_dt = datetime.now()
+    # let's not schedule in the past
+    if target_dt - now_dt <= timedelta(minutes=0):
+        msg = (
+            "target start time has already passed, "
+            "it's not possible to schedule a network split in the past"
+        )
+        LOGGER.error(msg)
+        raise ValueError(msg)
     # scheduling could take about 30 seconds for a cluster with 9 machines
     if target_dt - now_dt <= timedelta(minutes=1):
         msg = (
