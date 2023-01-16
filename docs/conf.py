@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = 'ocp-network-split'
-copyright = '2021, Martin Bukatovič'
+copyright = '2023, Martin Bukatovič'
 author = 'Martin Bukatovič'
 
 
