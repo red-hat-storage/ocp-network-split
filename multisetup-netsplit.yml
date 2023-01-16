@@ -2,8 +2,6 @@
 - name: core netsplit setup
   hosts: all
   remote_user: root
-  vars:
-    env_file: network-split.env
   tags:
     - netsplit
   handlers:
@@ -11,6 +9,12 @@
       ansible.builtin.systemd:
         daemon_reload: true
   tasks:
+
+    - name: Check that env_file is specified
+      assert:
+        that:
+          - env_file is defined
+        fail_msg: "you need specify env_file genered by ocp-network-split-mutisetup tool"
 
     - name: Install dependencies for netsplit setup
       dnf:
