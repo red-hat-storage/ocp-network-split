@@ -114,6 +114,8 @@ def get_zone_config_fromfile(file_content, translate_hostname=True):
     config.read_string(file_content)
     zc = zone.ZoneConfig()
     for zone_name in zone.ZONES:
+        if not config.has_section(zone_name):
+            continue
         for host_name in config[zone_name]:
             if translate_hostname:
                 host = socket.gethostbyname(host_name)

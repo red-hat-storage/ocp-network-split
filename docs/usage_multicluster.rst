@@ -99,8 +99,6 @@ specify our zone configuration in ``zone.ini`` file:
     osd-3.ceph.example.com
     osd-4.ceph.example.com
     osd-5.ceph.example.com
-    
-    [x]
 
 Moreover we will also need an ansible inventory file with all nodes which are
 not part of any OpenShift cluster. In our case this means an inventory with all
