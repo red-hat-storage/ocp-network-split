@@ -31,8 +31,8 @@ def test_zoneconfig_invalid_zone():
 
 def test_zoneconfig_add_nodes():
     zc = zone.ZoneConfig()
-    zone_b = ["10.1.160.175", "10.1.160.180", "10.1.160.188"]
-    zone_c = ["10.1.161.115", "10.1.160.192", "10.1.160.174"]
+    zone_b = ["198.51.100.175", "198.51.100.180", "198.51.100.188"]
+    zone_c = ["198.51.100.115", "198.51.100.192", "198.51.100.174"]
     zc.add_node("b", zone_b[0])
     zc.add_node("b", zone_b[1])
     zc.add_node("b", zone_b[2])
@@ -45,14 +45,14 @@ def test_zoneconfig_add_nodes():
 
 def test_zoneconfig_env_file():
     zc = zone.ZoneConfig()
-    zc.add_node("a", "10.1.161.11")
-    zc.add_nodes("b", ["10.1.160.175", "10.1.160.180", "10.1.160.188"])
-    zc.add_nodes("c", ["10.1.160.115", "10.1.160.192", "10.1.160.174"])
+    zc.add_node("a", "198.51.100.11")
+    zc.add_nodes("b", ["198.51.100.175", "198.51.100.180", "198.51.100.188"])
+    zc.add_nodes("c", ["198.51.100.115", "198.51.100.192", "198.51.100.174"])
     expected_content = textwrap.dedent(
         """\
-        ZONE_A="10.1.161.11"
-        ZONE_B="10.1.160.175 10.1.160.180 10.1.160.188"
-        ZONE_C="10.1.160.115 10.1.160.174 10.1.160.192"
+        ZONE_A="198.51.100.11"
+        ZONE_B="198.51.100.175 198.51.100.180 198.51.100.188"
+        ZONE_C="198.51.100.115 198.51.100.174 198.51.100.192"
     """
     )
     assert zc.get_env_file() == expected_content

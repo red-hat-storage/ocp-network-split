@@ -26,25 +26,25 @@ makes the script report what it would do instead of performing the setup:
 
 .. code:: console
 
-   $ export ZONE_A="192.168.1.199"
-   $ export ZONE_B="10.1.160.109 10.1.160.96 10.1.160.97 10.1.160.99"
-   $ export ZONE_C="10.1.160.103 10.1.160.84 10.1.160.87 10.1.160.98"
+   $ export ZONE_A="198.51.100.199"
+   $ export ZONE_B="198.51.100.109 198.51.100.96 198.51.100.97 198.51.100.99"
+   $ export ZONE_C="198.51.100.103 198.51.100.84 198.51.100.87 198.51.100.98"
    $ ./network-latency.sh -d 15
-   ZONE_A="192.168.1.199"
-   ZONE_B="10.1.160.109 10.1.160.96 10.1.160.97 10.1.160.99"
-   ZONE_C="10.1.160.103 10.1.160.84 10.1.160.87 10.1.160.98"
+   ZONE_A="198.51.100.199"
+   ZONE_B="198.51.100.109 198.51.100.96 198.51.100.97 198.51.100.99"
+   ZONE_C="198.51.100.103 198.51.100.84 198.51.100.87 198.51.100.98"
    current zone: ZONE_A
    tc qdisc del dev wlp61s0 root
    tc qdisc add dev wlp61s0 root handle 1: prio
    tc qdisc add dev wlp61s0 parent 1:1 handle 2: netem delay 15ms
-   tc filter add dev wlp61s0 parent 1: protocol ip prio 2 u32 match ip dst 10.1.160.109/32 flowid 3:1
-   tc filter add dev wlp61s0 parent 1: protocol ip prio 2 u32 match ip dst 10.1.160.96/32 flowid 3:1
-   tc filter add dev wlp61s0 parent 1: protocol ip prio 2 u32 match ip dst 10.1.160.97/32 flowid 3:1
-   tc filter add dev wlp61s0 parent 1: protocol ip prio 2 u32 match ip dst 10.1.160.99/32 flowid 3:1
-   tc filter add dev wlp61s0 parent 1: protocol ip prio 2 u32 match ip dst 10.1.160.103/32 flowid 3:1
-   tc filter add dev wlp61s0 parent 1: protocol ip prio 2 u32 match ip dst 10.1.160.84/32 flowid 3:1
-   tc filter add dev wlp61s0 parent 1: protocol ip prio 2 u32 match ip dst 10.1.160.87/32 flowid 3:1
-   tc filter add dev wlp61s0 parent 1: protocol ip prio 2 u32 match ip dst 10.1.160.98/32 flowid 3:1
+   tc filter add dev wlp61s0 parent 1: protocol ip prio 2 u32 match ip dst 198.51.100.109/32 flowid 3:1
+   tc filter add dev wlp61s0 parent 1: protocol ip prio 2 u32 match ip dst 198.51.100.96/32 flowid 3:1
+   tc filter add dev wlp61s0 parent 1: protocol ip prio 2 u32 match ip dst 198.51.100.97/32 flowid 3:1
+   tc filter add dev wlp61s0 parent 1: protocol ip prio 2 u32 match ip dst 198.51.100.99/32 flowid 3:1
+   tc filter add dev wlp61s0 parent 1: protocol ip prio 2 u32 match ip dst 198.51.100.103/32 flowid 3:1
+   tc filter add dev wlp61s0 parent 1: protocol ip prio 2 u32 match ip dst 198.51.100.84/32 flowid 3:1
+   tc filter add dev wlp61s0 parent 1: protocol ip prio 2 u32 match ip dst 198.51.100.87/32 flowid 3:1
+   tc filter add dev wlp61s0 parent 1: protocol ip prio 2 u32 match ip dst 198.51.100.98/32 flowid 3:1
 
 The script doesn't implement teardown to revert into the original traffic queue
 configuration.
@@ -100,9 +100,9 @@ debug`` and check status of ``network-latency`` service there:
           CPU: 46ms
 
     Sep 28 00:32:15 compute-5 systemd[1]: Starting Linux Traffic Control enforced network latency setup...
-    Sep 28 00:32:15 compute-5 bash[1614]: ZONE_A="10.1.160.94"
-    Sep 28 00:32:15 compute-5 bash[1614]: ZONE_B="10.1.160.109 10.1.160.96 10.1.160.97 10.1.160.99"
-    Sep 28 00:32:15 compute-5 bash[1614]: ZONE_C="10.1.160.103 10.1.160.84 10.1.160.87 10.1.160.98"
+    Sep 28 00:32:15 compute-5 bash[1614]: ZONE_A="198.51.100.94"
+    Sep 28 00:32:15 compute-5 bash[1614]: ZONE_B="198.51.100.109 198.51.100.96 198.51.100.97 198.51.100.99"
+    Sep 28 00:32:15 compute-5 bash[1614]: ZONE_C="198.51.100.103 198.51.100.84 198.51.100.87 198.51.100.98"
     Sep 28 00:32:15 compute-5 bash[1614]: current zone: ZONE_C
     Sep 28 00:32:15 compute-5 bash[1614]: Error: Cannot delete qdisc with handle of zero.
     Sep 28 00:32:15 compute-5 systemd[1]: network-latency.service: Succeeded.
@@ -116,14 +116,14 @@ two times the delay, 212 ms:
 
 .. code:: console
 
-    sh-4.4# ping 10.1.160.96
-    PING 10.1.160.96 (10.1.160.96) 56(84) bytes of data.
-    64 bytes from 10.1.160.96: icmp_seq=1 ttl=64 time=212 ms
-    64 bytes from 10.1.160.96: icmp_seq=2 ttl=64 time=212 ms
-    64 bytes from 10.1.160.96: icmp_seq=3 ttl=64 time=212 ms
-    64 bytes from 10.1.160.96: icmp_seq=4 ttl=64 time=212 ms
+    sh-4.4# ping 198.51.100.96
+    PING 198.51.100.96 (198.51.100.96) 56(84) bytes of data.
+    64 bytes from 198.51.100.96: icmp_seq=1 ttl=64 time=212 ms
+    64 bytes from 198.51.100.96: icmp_seq=2 ttl=64 time=212 ms
+    64 bytes from 198.51.100.96: icmp_seq=3 ttl=64 time=212 ms
+    64 bytes from 198.51.100.96: icmp_seq=4 ttl=64 time=212 ms
     ^C
-    --- 10.1.160.96 ping statistics ---
+    --- 198.51.100.96 ping statistics ---
     4 packets transmitted, 4 received, 0% packet loss, time 3004ms
     rtt min/avg/max/mdev = 212.292/212.326/212.347/0.564 ms
 
@@ -132,12 +132,12 @@ additional delay:
 
 .. code:: console
 
-    sh-4.4# ping 10.1.160.84
-    PING 10.1.160.84 (10.1.160.84) 56(84) bytes of data.
-    64 bytes from 10.1.160.84: icmp_seq=1 ttl=64 time=0.086 ms
-    64 bytes from 10.1.160.84: icmp_seq=2 ttl=64 time=0.059 ms
-    64 bytes from 10.1.160.84: icmp_seq=3 ttl=64 time=0.060 ms
+    sh-4.4# ping 198.51.100.84
+    PING 198.51.100.84 (198.51.100.84) 56(84) bytes of data.
+    64 bytes from 198.51.100.84: icmp_seq=1 ttl=64 time=0.086 ms
+    64 bytes from 198.51.100.84: icmp_seq=2 ttl=64 time=0.059 ms
+    64 bytes from 198.51.100.84: icmp_seq=3 ttl=64 time=0.060 ms
     ^C
-    --- 10.1.160.84 ping statistics ---
+    --- 198.51.100.84 ping statistics ---
     3 packets transmitted, 3 received, 0% packet loss, time 2053ms
     rtt min/avg/max/mdev = 0.059/0.068/0.086/0.014 ms

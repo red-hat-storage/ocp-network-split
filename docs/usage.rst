@@ -77,9 +77,9 @@ looks like (the example also shows how to define zone name mapping):
 .. code-block:: console
 
    $ ocp-network-split-setup -a arbiter -b data-1 -c data-2 --print-env-only
-   ZONE_A="10.1.160.36"
-   ZONE_B="10.1.160.127 10.1.160.158 10.1.160.160 10.1.160.163"
-   ZONE_C="10.1.160.103 10.1.160.162 10.1.160.65 10.1.160.98"
+   ZONE_A="198.51.100.36"
+   ZONE_B="198.51.100.127 198.51.100.158 198.51.100.160 198.51.100.163"
+   ZONE_C="198.51.100.103 198.51.100.162 198.51.100.65 198.51.100.98"
 
 If this looks good, we can go on and create ``MachineConfig`` yaml file, which
 you can inspect as well.

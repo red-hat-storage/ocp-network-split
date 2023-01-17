@@ -30,32 +30,32 @@ One can see what changes will be made via ``-d`` option:
 
 .. code-block:: console
 
-    $ export ZONE_A="10.1.161.27"
-    $ export ZONE_B="10.1.160.175 10.1.160.180 10.1.160.188 10.1.160.198"
-    $ export ZONE_C="10.1.161.115 10.1.160.192 10.1.160.174 10.1.160.208"
+    $ export ZONE_A="198.51.100.27"
+    $ export ZONE_B="198.51.100.175 198.51.100.180 198.51.100.188 198.51.100.198"
+    $ export ZONE_C="198.51.100.115 198.51.100.192 198.51.100.174 198.51.100.208"
     $ ./network-split.sh -d setup ab-ac
-    ZONE_A="10.40.195.21"
-    ZONE_B="10.1.160.175 10.1.160.180 10.1.160.188 10.1.160.198"
-    ZONE_C="10.1.161.115 10.1.160.192 10.1.160.174 10.1.160.208"
+    ZONE_A="198.51.100.27"
+    ZONE_B="198.51.100.175 198.51.100.180 198.51.100.188 198.51.100.198"
+    ZONE_C="198.51.100.115 198.51.100.192 198.51.100.174 198.51.100.208"
     current zone: ZONE_A
     ab: ZONE_B will be blocked from ZONE_A
-    iptables -A INPUT -s 10.1.160.175 -j DROP -v
-    iptables -A OUTPUT -d 10.1.160.175 -j DROP -v
-    iptables -A INPUT -s 10.1.160.180 -j DROP -v
-    iptables -A OUTPUT -d 10.1.160.180 -j DROP -v
-    iptables -A INPUT -s 10.1.160.188 -j DROP -v
-    iptables -A OUTPUT -d 10.1.160.188 -j DROP -v
-    iptables -A INPUT -s 10.1.160.198 -j DROP -v
-    iptables -A OUTPUT -d 10.1.160.198 -j DROP -v
+    iptables -A INPUT -s 198.51.100.175 -j DROP -v
+    iptables -A OUTPUT -d 198.51.100.175 -j DROP -v
+    iptables -A INPUT -s 198.51.100.180 -j DROP -v
+    iptables -A OUTPUT -d 198.51.100.180 -j DROP -v
+    iptables -A INPUT -s 198.51.100.188 -j DROP -v
+    iptables -A OUTPUT -d 198.51.100.188 -j DROP -v
+    iptables -A INPUT -s 198.51.100.198 -j DROP -v
+    iptables -A OUTPUT -d 198.51.100.198 -j DROP -v
     ac: ZONE_C will be blocked from ZONE_A
-    iptables -A INPUT -s 10.1.161.115 -j DROP -v
-    iptables -A OUTPUT -d 10.1.161.115 -j DROP -v
-    iptables -A INPUT -s 10.1.160.192 -j DROP -v
-    iptables -A OUTPUT -d 10.1.160.192 -j DROP -v
-    iptables -A INPUT -s 10.1.160.174 -j DROP -v
-    iptables -A OUTPUT -d 10.1.160.174 -j DROP -v
-    iptables -A INPUT -s 10.1.160.208 -j DROP -v
-    iptables -A OUTPUT -d 10.1.160.208 -j DROP -v
+    iptables -A INPUT -s 198.51.100.115 -j DROP -v
+    iptables -A OUTPUT -d 198.51.100.115 -j DROP -v
+    iptables -A INPUT -s 198.51.100.192 -j DROP -v
+    iptables -A OUTPUT -d 198.51.100.192 -j DROP -v
+    iptables -A INPUT -s 198.51.100.174 -j DROP -v
+    iptables -A OUTPUT -d 198.51.100.174 -j DROP -v
+    iptables -A INPUT -s 198.51.100.208 -j DROP -v
+    iptables -A OUTPUT -d 198.51.100.208 -j DROP -v
 
 Systemd Units
 -------------
@@ -84,9 +84,9 @@ Example of starting network split for ``ab-bc`` and checking it's status:
           CPU: 8ms
 
     Mar 06 00:23:18 compute-5 systemd[1]: Starting Firewall configuration for a network split...
-    Mar 06 00:23:18 compute-5 bash[16380]: ZONE_A="10.1.161.27"
-    Mar 06 00:23:18 compute-5 bash[16380]: ZONE_B="10.1.160.175 10.1.160.180 10.1.160.188 10.1.160.198"
-    Mar 06 00:23:18 compute-5 bash[16380]: ZONE_C="10.1.161.115 10.1.160.192 10.1.160.174 10.1.160.208"
+    Mar 06 00:23:18 compute-5 bash[16380]: ZONE_A="198.51.100.27"
+    Mar 06 00:23:18 compute-5 bash[16380]: ZONE_B="198.51.100.175 198.51.100.180 198.51.100.188 198.51.100.198"
+    Mar 06 00:23:18 compute-5 bash[16380]: ZONE_C="198.51.100.115 198.51.100.192 198.51.100.174 198.51.100.208"
     Mar 06 00:23:18 compute-5 bash[16380]: current zone: ZONE_C
     Mar 06 00:23:18 compute-5 bash[16380]: ab: ZONE_B will be blocked from ZONE_A
     Mar 06 00:23:18 compute-5 bash[16380]: bc: ZONE_C will be blocked from ZONE_B
