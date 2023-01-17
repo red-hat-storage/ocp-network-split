@@ -14,3 +14,5 @@ tmp
 venv
 *.yaml
 *.ini
+*.hosts
+*.env
