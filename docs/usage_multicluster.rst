@@ -211,7 +211,7 @@ nodes, updating (and rebooting) one worker and one master node in parallel:
    worker   rendered-worker-5bec341d2088c2cec8be7b024f9f7a05   False     True       False      3              1                   1                     0                      4h48m
 
 So while we wait for both master and worker machine config pools to reach
-``UPDATED`` condition again on all out OpenShift clusters, we can deploy the
+``UPDATED`` condition again on all our OpenShift clusters, we can deploy the
 same set of scripts on the nodes which are not part of any OpenShift cluster
 via ansible plabyook ``multisetup-netsplit.yml``. In our case, this means on
 all Ceph nodes, so we will reuse the ceph inventory file. Note that we need to
