@@ -3,9 +3,10 @@
 ===================
 
 Project ``ocp-network-split`` provides functionality to block (and unblock)
-network traffic between `k8s zones`_, implemented by updating firewall rules on
-all nodes of `OpenShift 4`_ cluster. The feature can be used either via command
-line tools or a python module.
+network traffic between `OpenShift 4`_ cluster zones and to optionally create
+additional network latency among all zones. It's intended to be used for
+*testing purposes* only. The feature can be used either via command line tools
+or a python module.
 
 This is useful when you need to separate network between given zones for
 *testing purposes*, without affecting other traffic and with no assumptions
@@ -34,11 +35,11 @@ Mirrors:
 License
 -------
 
-Copyright 2021 Martin Bukatovič
+Copyright 2023 Martin Bukatovič
 
 Distributed under the terms of the `Apache License 2.0`_ license;
 you may not use this project except in compliance with the License.
 
 .. _`k8s zones`: https://kubernetes.io/docs/reference/labels-annotations-taints/#topologykubernetesiozone
-.. _`OpenShift 4`: https://docs.openshift.com/container-platform/4.7/welcome/index.html
+.. _`OpenShift 4`: https://docs.openshift.com/container-platform/latest/welcome/index.html
 .. _`Apache License 2.0`: http://www.apache.org/licenses/LICENSE-2.0
