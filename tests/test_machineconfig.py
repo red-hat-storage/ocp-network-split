@@ -142,12 +142,13 @@ def test_create_latency_mc_dict_content():
 
     # there is a network split script
     file_list = mcd["spec"]["config"]["storage"]["files"]
-    assert len(file_list) == 2
+    assert len(file_list) == 3
     file_paths = []
     for file in file_list:
         file_paths.append(file["path"])
     assert "/etc/modules-load.d/sch_netem.conf" in file_paths
     assert "/etc/network-latency.sh" in file_paths
+    assert "/etc/network-pingtest.sh" in file_paths
 
     # there is one systemd unit
     assert len(mcd["spec"]["config"]["systemd"]["units"]) == 1

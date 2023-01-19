@@ -78,6 +78,14 @@
         group: root
         mode: 0544
 
+    - name: Copy pingtest script for debugging latency on nodes
+      copy:
+        src: "ocpnetsplit/network-pingtest.sh"
+        dest: "/etc/network-pingtest.sh"
+        owner: root
+        group: root
+        mode: 0544
+
     - name: Copy latency unit file
       ansible.builtin.template:
         src: "ocpnetsplit/systemd/network-latency.service"

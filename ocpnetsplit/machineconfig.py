@@ -272,6 +272,10 @@ def create_latency_mc_dict(role, latency):
     script_dict = create_script_dict("network-latency.sh")
     mcd["spec"]["config"]["storage"]["files"].append(script_dict)
 
+    # include pingtest file
+    ping_script_dict = create_script_dict("network-pingtest.sh")
+    mcd["spec"]["config"]["storage"]["files"].append(ping_script_dict)
+
     # include systemd unit service for the latency script
     unit_dict = create_systemdunit_dict("network-latency.service")
     # hardcode the given latency value into systemd service unit
