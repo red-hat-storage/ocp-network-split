@@ -19,7 +19,7 @@ setup(
     # version scheme:
     # - "x.y.1" under development, will become "x.y+1.0" when released
     # - "x.y.0" released version, there is a matching git tag
-    version='0.2.0',
+    version='0.2.1',
     description=(
         'OCP 4 platform agnostic firewall based network split tool '
         'for testing network disruptions on zone level.'),
