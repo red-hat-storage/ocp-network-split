@@ -4,10 +4,6 @@
   remote_user: root
   tags:
     - latency
-  handlers:
-    - name: daemon-reload
-      ansible.builtin.systemd:
-        daemon_reload: true
   tasks:
 
     - name: Check that network latency is specified
@@ -92,11 +88,15 @@
         dest: "/etc/systemd/system/network-latency.service"
         owner: root
         group: root
-      notify:
-      - daemon-reload
+      register: latency_unit_file
 
-    - name: Start and enable the latency service
+    - name: Daemon reload
+      ansible.builtin.systemd:
+        daemon_reload: true
+      when: latency_unit_file.changed
+
+    - name: Restart and enable the latency service
       ansible.builtin.systemd:
         name: network-latency
         enabled: true
-        state: started
+        state: restarted
