@@ -18,7 +18,7 @@ show_help()
 {
   echo "Configure egress network latency via netem qdisc for a 3 zone cluster"
   echo
-  echo "Usage: $(basename "${0}") [-d] [-l LATSPEC] <default egress latency>"
+  echo "Usage: $(basename "${0}") [-d] [-l LATSPEC] <default latency|teardown>"
   echo
   echo "Where 'LATSPEC' defines specific latency between particular zones."
   echo "Eg.: 'AC=20' will set 20ms latency between zones A and C, while the"
@@ -27,7 +27,17 @@ show_help()
   echo The default latency is mandatory, while the optional zone specific one
   echo can be specified multiple times, for each zone connection as necessary.
   echo
+  echo When you specify "teardown" command instead of the default latency, the
+  echo current root qdisc is removed which will remove any latency previously
+  echo configured by this tool.
+  echo
   echo "Examples: $(basename "${0}") -l AB=25 -l AC=25 5"
+}
+
+tc_show()
+{
+  $DEBUG_MODE tc qdisc show dev "${iface}"
+  $DEBUG_MODE tc class show dev "${iface}"
 }
 
 if [[ $# = 0 ]]; then
@@ -73,6 +83,8 @@ fi
 # script
 if [[ $1 =~ ^[0-9]+$ ]]; then
   latency=${1}
+elif [[ $1 = teardown ]]; then
+  teardown=1
 else
   echo "The default egress latency specified $1 is not an integer value." >&2
   exit 1
@@ -97,6 +109,13 @@ echo "network interface: $iface"
 # TODO: instead of deleting the original qdiscs, just alter it (would be
 # more complex and error prone, it's not clear it's worth the effort)
 $DEBUG_MODE tc qdisc del dev "${iface}" root
+
+if [[ -n $teardown ]]; then
+  # report what qdiscs structure was created by default after the previous
+  # one was removed, and then just exit
+  tc_show
+  exit
+fi
 
 # dict for tracking qdisc with specific latency
 declare -A qdisc_handles
@@ -154,3 +173,6 @@ for zone_name in ZONE_A ZONE_B ZONE_C; do
     $DEBUG_MODE tc filter add dev "${iface}" parent 1: protocol ip prio 1 u32 match ip dst ${ip_addr}/32 flowid ${handle}
   done
 done
+
+# report the result
+tc_show
