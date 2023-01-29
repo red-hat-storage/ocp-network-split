@@ -33,6 +33,13 @@ zones).
    usage_multicluster.rst
    modules.rst
 
+Upstream
+========
+
+The latest version of the documentation you are curretnly reading is available
+online at gitlab pages: https://mbukatov.gitlab.io/ocp-network-split
+
+Source code repository: https://gitlab.com/mbukatov/ocp-network-split
 
 Indices and tables
 ==================
