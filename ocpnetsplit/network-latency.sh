@@ -100,6 +100,14 @@ fi
 # report current zone
 echo "current zone: $current_zone"
 
+# fail when there are multiple default routes, since this script assumes that
+# there is single default route, and works with it's interface only
+if [[ $(ip route show default | wc -l) -gt 1 ]]; then
+  ip route show default >&2
+  echo "error: multiple default routes detected, can't continue" >&2
+  exit 1
+fi
+
 # locate main network interface (assuming all nodes are on a single network)
 iface=$(ip route show default | cut -d' ' -f5)
 echo "network interface: $iface"
