@@ -21,7 +21,7 @@ show_help()
   echo "Usage: $(basename "${0}") [-d] [-l LATSPEC] <default latency|teardown>"
   echo
   echo "Where 'LATSPEC' defines specific latency between particular zones."
-  echo "Eg.: 'AC=20' will set 20ms latency between zones A and C, while the"
+  echo "Eg.: 'ac=20' will set 20ms latency between zones a and c, while the"
   echo "rest of inter zone connections will use the default latency."
   echo
   echo The default latency is mandatory, while the optional zone specific one
@@ -31,7 +31,7 @@ show_help()
   echo current root qdisc is removed which will remove any latency previously
   echo configured by this tool.
   echo
-  echo "Examples: $(basename "${0}") -l AB=25 -l AC=25 5"
+  echo "Examples: $(basename "${0}") -l ab=25 -l ac=25 5"
 }
 
 tc_show()
@@ -55,8 +55,8 @@ while getopts "dl:h" OPT; do
   # shellcheck disable=SC2209
   case $OPT in
   d) DEBUG_MODE=echo;;
-  l) if [[ "$OPTARG" =~ ^([ABCX]{2})=([0-9]+)$ ]]; then
-       zones=$(echo "${BASH_REMATCH[1]}" | grep -o . | sort | tr -d "\n");
+  l) if [[ "$OPTARG" =~ ^([ABCXabcx]{2})=([0-9]+)$ ]]; then
+       zones=$(echo "${BASH_REMATCH[1]}" | tr abcx ABCX | grep -o . | sort | tr -d "\n");
        value=${BASH_REMATCH[2]};
        if [[ -n ${latspec[$zones]} ]]; then
          echo "Specific latency for $zones is defined multiple times." >&2;
