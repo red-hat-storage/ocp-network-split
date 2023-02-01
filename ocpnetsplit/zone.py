@@ -92,3 +92,73 @@ class ZoneConfig:
             nodes = " ".join(sorted(node_list))
             lines.append(f'ZONE_{zone.upper()}="{nodes}"')
         return "\n".join(lines) + "\n"
+
+
+class ZoneLatSpec:
+    """
+    Describe latency values between given zones.
+
+    Validation of input latency spec is necessary to catch mistakes as early as
+    possible (debugging the problem later on a live cluster increases cost of
+    debugging and a fix significantly).
+    """
+
+    def __init__(self, **kwargs):
+        self._latspec = {}
+        if kwargs is not None and len(kwargs) > 0:
+            self.load_dict(kwargs)
+
+    def load_arguments(self, latency_spec):
+        """
+        Load latency spec from the given list produced by argparse parser.
+
+        Args:
+            latency_spec (list): List of latency specs from argument parser.
+                Eg.: ``['ab=10', 'bc=10']``.
+        """
+        lat_spec_dict = {}
+        for latspec in latency_spec:
+            zones, v = latspec.split("=")
+            if zones in lat_spec_dict and lat_spec_dict[zones] != v:
+                raise ValueError(
+                    f"Latency between {zones} zones specified multiple times.")
+            lat_spec_dict[zones] = v
+        self.load_dict(lat_spec_dict)
+
+    def load_dict(self, latency_spec):
+        """
+        Load latency spec from the given dict.
+
+        Args:
+            latency_spec (dict): specific latency between given zones, for
+            example ``{'ab'=11}`` will represent 22ms RTT latency between zones
+            ``a`` and ``b``.
+        """
+        for zones, v in latency_spec.items():
+            if type(v) == str:
+                if not v.isnumeric():
+                    raise ValueError(f"non numeric latency value in '{zones}={v}'")
+            elif type(v) != int:
+                raise ValueError(f"non numeric latency value in '{zones}={v}'")
+            if len(zones) != 2:
+                raise ValueError(
+                    f"Invalid number of zones in latenc spec '{zones}={v}'")
+            for zone in zones:
+                if zone not in ZONES:
+                    raise ValueError(
+                        f"Invalid zone '{zone}' in latency spec '{zones}={v}'")
+            zones = "".join(sorted(zones))
+            if zones in self._latspec and self._latspec[zones] != v:
+                raise ValueError(
+                    f"Latency between {zones} zones specified multiple times.")
+            self._latspec[zones] = v
+
+    def get_cli_args(self):
+        """
+        Generate command line arguments for network-latency.sh script
+        representing latency spec of this object.
+        """
+        arglist = []
+        for zones, latency in self._latspec.items():
+            arglist.append(f"-l {zones}={latency}")
+        return " ".join(arglist)

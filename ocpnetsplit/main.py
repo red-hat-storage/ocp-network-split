@@ -125,7 +125,7 @@ def get_zone_config_fromfile(file_content, translate_hostname=True):
     return zc
 
 
-def get_networksplit_mc_spec(zone_env=None, split=False, latency=0):
+def get_networksplit_mc_spec(zone_env=None, split=False, latency=0, latency_spec=None):
     """
     Create ``MachineConfig`` spec to install network split firewall tweaking
     script and unit files on all cluster nodes.
@@ -134,6 +134,11 @@ def get_networksplit_mc_spec(zone_env=None, split=False, latency=0):
         zone_env (str): content of firewall zone env file specifying node ip
             addresses for each cluster zone, as created by
             :py:meth:`ocpnetsplit.zone.ZoneConfig.get_env_file`
+        split (bool): when true, support for net splits will be included
+        latency (int): default zone latency created via Linux Traffic Control
+            in ms, when the value is zero, support for latency is not included
+        latency_spec (:py:class`ocpnetsplit.zone.ZoneLatSpec`): specific
+            latency between given zones (optional).
 
     Returns:
         machineconfig_spec: list of dictionaries with ``MachineConfig`` spec
@@ -143,7 +148,7 @@ def get_networksplit_mc_spec(zone_env=None, split=False, latency=0):
         if zone_env is not None:
             mc_spec.append(machineconfig.create_zone_mc_dict(role, zone_env))
         if latency != 0:
-            mc_spec.append(machineconfig.create_latency_mc_dict(role, latency))
+            mc_spec.append(machineconfig.create_latency_mc_dict(role, latency, latency_spec))
         if split:
             mc_spec.append(machineconfig.create_split_mc_dict(role))
     return mc_spec
@@ -308,7 +313,12 @@ def main_setup():
         "-l",
         default=0,
         type=int,
-        help="network latency in ms to be created among zones")
+        help="default network latency in ms to be created among zones")
+    ap.add_argument(
+        "--latency-spec",
+        nargs="*",
+        type=str,
+        help='network latency in ms among given zones, eg. "ab=10 ac=25"')
     ap.add_argument(
         "--debug",
         action="store_true",
@@ -339,11 +349,19 @@ def main_setup():
             print(zone_env)
             return
 
+    # get zone latency spec object if latency_spec was specified via argument
+    if args.latency_spec is not None:
+        latency_spec = zone.ZoneLatSpec()
+        latency_spec.load_arguments(args.latency_spec)
+    else:
+        latency_spec = None
+
     # get MachineConfig spec (ready to deploy list of dics)
     mc = get_networksplit_mc_spec(
             zone_env,
             split=(not args.no_split),
-            latency=args.latency)
+            latency=args.latency,
+            latency_spec=latency_spec)
     args.output.write(yaml.dump_all(mc))
 
 
@@ -385,7 +403,12 @@ def main_multisetup():
         "-l",
         default=0,
         type=int,
-        help="network latency in ms to be created among zones")
+        help="default network latency in ms to be created among zones")
+    ap.add_argument(
+        "--latency-spec",
+        nargs="*",
+        type=str,
+        help='network latency in ms among given zones, eg. "ab=10 ac=25"')
     ap.add_argument(
         "--debug",
         action="store_true",
@@ -401,11 +424,19 @@ def main_multisetup():
     # save separate zoneconfig (for ansible deployment later)
     args.env.write(zone_env)
 
+    # get zone latency spec object if latency_spec was specified via argument
+    if args.latency_spec is not None:
+        latency_spec = zone.ZoneLatSpec()
+        latency_spec.load_arguments(args.latency_spec)
+    else:
+        latency_spec = None
+
     # get MachineConfig spec (ready to deploy list of dics)
     mc = get_networksplit_mc_spec(
             zone_env,
             split=(not args.no_split),
-            latency=args.latency)
+            latency=args.latency,
+            latency_spec=latency_spec)
     args.mc.write(yaml.dump_all(mc))
 
 

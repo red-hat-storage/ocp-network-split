@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
 
+import argparse
 import textwrap
 
 import pytest
@@ -56,3 +57,52 @@ def test_zoneconfig_env_file():
     """
     )
     assert zc.get_env_file() == expected_content
+
+
+def test_zonelatspec_null():
+    zls = zone.ZoneLatSpec()
+    assert zls.get_cli_args() == ""
+
+
+def test_zonelatspec_invalid():
+    with pytest.raises(ValueError):
+        zone.ZoneLatSpec(ab=7,ah=11)
+    with pytest.raises(ValueError):
+        zone.ZoneLatSpec(ac=7,abc=5)
+
+
+def test_zonelatspec_invalid_nan():
+    with pytest.raises(ValueError):
+        zone.ZoneLatSpec(ab=101.1)
+    with pytest.raises(ValueError):
+        zone.ZoneLatSpec(ab='foo')
+
+
+def test_zonelatspec_simple():
+    zls = zone.ZoneLatSpec(ab=10)
+    assert zls.get_cli_args() == "-l ab=10"
+
+
+def test_zonelatspec_canonical():
+    zls1 = zone.ZoneLatSpec(ab=101)
+    zls2 = zone.ZoneLatSpec(ba=101)
+    assert zls1.get_cli_args() == zls2.get_cli_args()
+
+
+def test_zonelatspec_valid_duplicates():
+    zls = zone.ZoneLatSpec(ab=101,ba=101)
+    assert zls.get_cli_args() == "-l ab=101"
+
+
+def test_zonelatspec_complex():
+    zls = zone.ZoneLatSpec(ab=11,ac=7,ax=100,bx=100)
+    assert zls.get_cli_args() == "-l ab=11 -l ac=7 -l ax=100 -l bx=100"
+
+
+def test_zonelatspec_from_argparse():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-l", nargs="*", type=str)
+    args = parser.parse_args('-l ab=11 ac=7'.split())
+    zls = zone.ZoneLatSpec()
+    zls.load_arguments(args.l)
+    assert zls.get_cli_args() == "-l ab=11 -l ac=7"

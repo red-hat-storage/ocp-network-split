@@ -6,6 +6,7 @@ import textwrap
 import pytest
 
 from ocpnetsplit import machineconfig
+from ocpnetsplit import zone
 
 
 def test_create_file_dict_emptyname():
@@ -152,3 +153,15 @@ def test_create_latency_mc_dict_content():
 
     # there is one systemd unit
     assert len(mcd["spec"]["config"]["systemd"]["units"]) == 1
+
+
+def test_create_latency_mc_dict_content_latspec():
+    latspec = zone.ZoneLatSpec(ab=50,ac=70)
+    mcd = machineconfig.create_latency_mc_dict("worker", 10, latspec)
+
+    # there is one systemd unit
+    assert len(mcd["spec"]["config"]["systemd"]["units"]) == 1
+
+    # check that the latency command line was expanded correctly
+    unit_content = mcd["spec"]["config"]["systemd"]["units"][0]["contents"]
+    assert "network-latency.sh -l ab=50 -l ac=70 10" in unit_content
