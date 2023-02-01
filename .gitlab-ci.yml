@@ -4,7 +4,7 @@ stages:
   - docs
 
 flake8:
-  image: python:3.9
+  image: python:3.11
   stage: lint
   script:
     - pip install tox
@@ -16,22 +16,22 @@ shellcheck:
   script:
     - shellcheck ocpnetsplit/*.sh
 
-py37:
-  image: python:3.7
+py38:
+  image: python:3.8
   stage: test
   script:
     - pip install tox
-    - tox -e py37
+    - tox -e py38
 
-py39:
-  image: python:3.9
+py311:
+  image: python:3.11
   stage: test
   script:
     - pip install tox
-    - tox -e py39
+    - tox -e py311
 
 pages:
-  image: python:3.9
+  image: python:3.11
   stage: docs
   script:
     - pip install sphinx
