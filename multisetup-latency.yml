@@ -16,6 +16,22 @@
     - debug:
         var: latency
 
+    - debug:
+        var: latency_spec
+
+    - name: Transform latency_spec for the network-latency.sh script
+      set_fact:
+        latency_spec_opts: "-l {{ latency_spec.items() | map('join', '=') | join(' -l ') }}"
+      when: latency_spec is defined
+
+    - name: Set empty latency_spec for the network-latency.sh script
+      set_fact:
+        latency_spec_opts: ""
+      when: latency_spec is not defined
+
+    - debug:
+        var: latency_spec_opts
+
     - name: Install tc dependencies for latency setup
       dnf:
         name:

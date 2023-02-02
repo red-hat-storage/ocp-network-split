@@ -287,10 +287,10 @@ def create_latency_mc_dict(role, latency, latency_spec=None):
     # hardcode spec. latency values into systemd service unit if requested
     if latency_spec is None:
         unit_dict["contents"] = unit_dict["contents"].replace(
-            "{{ latency_spec }} ", "")
+            "{{ latency_spec_opts }} ", "")
     else:
         unit_dict["contents"] = unit_dict["contents"].replace(
-            "{{ latency_spec }}", latency_spec.get_cli_args())
+            "{{ latency_spec_opts }}", latency_spec.get_cli_args())
     mcd["spec"]["config"]["systemd"]["units"].append(unit_dict)
 
     return mcd
