@@ -118,7 +118,11 @@ def get_zone_config_fromfile(file_content, translate_hostname=True):
             continue
         for host_name in config[zone_name]:
             if translate_hostname:
-                host = socket.gethostbyname(host_name)
+                try:
+                    host = socket.gethostbyname(host_name)
+                except socket.gaierror as ex:
+                    msg = f"DNS lookup for '{host_name}' failed: {ex.strerror} [errno {ex.errno}]"
+                    raise Exception(msg)
             else:
                 host = host_name
             zc.add_node(zone_name, host)
@@ -419,7 +423,11 @@ def main_multisetup():
         logging.basicConfig(level=logging.DEBUG)
 
     # get zoneconfig from the ansible inventory like ini file
-    zone_config = get_zone_config_fromfile(args.zonefile.read())
+    try:
+        zone_config = get_zone_config_fromfile(args.zonefile.read())
+    except Exception as ex:
+        print(f"Failed to process zonefile: {ex}", file=sys.stderr)
+        return 1
     zone_env = zone_config.get_env_file()
     # save separate zoneconfig (for ansible deployment later)
     args.env.write(zone_env)
