@@ -14,7 +14,7 @@
       assert:
         that:
           - env_file is defined
-        fail_msg: "you need specify env_file genered by ocp-network-split-mutisetup tool"
+        fail_msg: "you need specify env_file genered by ocp-network-split-multisetup tool"
 
     - name: Install dependencies for netsplit setup
       dnf:

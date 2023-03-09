@@ -30,7 +30,7 @@ Command line tools
 
 Overview of command line tools applicable for *multi cluster* use case:
 
-- ``ocp-network-split-mutisetup``: based on given zone config file
+- ``ocp-network-split-multisetup``: based on given zone config file
   (see :ref:`zone_config_example` example)
   this tool creates env file (with zone configuration for ocp network split
   firewall scripts) and ``MachineConfig``
@@ -59,7 +59,7 @@ Overview of the setup process:
    files,
 2) :ref:`mc_ssh_config`: we can access all nodes in all zones via ssh,
 3) Generate ``MachineConfig`` yaml and zone env files via
-   ``ocp-network-split-mutisetup`` command line tool,
+   ``ocp-network-split-multisetup`` command line tool,
 4) Deploy the ``MachineConfig`` yaml file on all OpenShift clusters,
 5) Deploy the scripts via multicluster ansible playbook(s) on all nodes which
    are not part of any OpenShift cluster (in our case, this means on all Ceph
@@ -181,7 +181,7 @@ Setting up network split
 Based on ``zone.ini`` file we created during :ref:`zone_config_example`, we
 will generate both ``MachineConfig`` yaml file and an env file with zone
 configuration (for ocp network split firewall scripts) using
-``ocp-network-split-mutisetup`` command line tool. Option ``--mc`` specifies
+``ocp-network-split-multisetup`` command line tool. Option ``--mc`` specifies
 desired name of the yaml file, while ``--env`` specifies
 name of the file where the env file will be saved.
 
@@ -230,7 +230,7 @@ Introducing additional network latency
 
 If we need to configure additional artificial network latency between nodes
 from different cluster zones, we can specify the desired one way latency in
-milliseconds via ``--latency`` option of ``ocp-network-split-mutisetup``
+milliseconds via ``--latency`` option of ``ocp-network-split-multisetup``
 command line tool. The total RTT latency value will reach roughly 2 times the
 value we specify this way.
 
@@ -240,7 +240,7 @@ reboots of OpenShift nodes.
 
 So for example to set 10 ms RTT artificial latency and deploy network split
 support, we will need to go through section :ref:`mc_cli_setup` above, adding
-option ``--latency 5`` for ``ocp-network-split-mutisetup`` tool and then in the
+option ``--latency 5`` for ``ocp-network-split-multisetup`` tool and then in the
 end, run another playbook ``multisetup-latency.yml`` where we need to
 specify the same latency value again:
 

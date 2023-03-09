@@ -3,7 +3,7 @@
 Overview of the network split approach
 ======================================
 
-A quick overview of what and how opc-network-split does to block network
+A quick overview of what and how ocp-network-split does to block network
 traffic between cluster zones.
 
 Network split firewall script

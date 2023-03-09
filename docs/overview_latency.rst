@@ -3,7 +3,7 @@
 Additional latency approach
 ===========================
 
-A quick overview of what opc-network-split does to introduce latency among
+A quick overview of what ocp-network-split does to introduce latency among
 nodes of different cluster zones.
 
 Network latency script
