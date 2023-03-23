@@ -138,6 +138,9 @@ def create_unit_dict(name, content):
     unit_dict = yaml.safe_load(UNIT_SKEL)
     unit_dict["name"] = name
     unit_dict["contents"] = content
+    # don't try to enable systemd unit templates
+    if "@" in name:
+        del unit_dict["enabled"]
     return unit_dict
 
 
