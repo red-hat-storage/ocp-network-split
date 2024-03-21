@@ -4,7 +4,7 @@ stages:
   - docs
 
 flake8:
-  image: python:3.11
+  image: python:3.12
   stage: lint
   script:
     - pip install tox
@@ -23,15 +23,15 @@ py38:
     - pip install tox
     - tox -e py38
 
-py311:
-  image: python:3.11
+py312:
+  image: python:3.12
   stage: test
   script:
     - pip install tox
-    - tox -e py311
+    - tox -e py312
 
 pages:
-  image: python:3.11
+  image: python:3.12
   stage: docs
   script:
     - pip install sphinx
