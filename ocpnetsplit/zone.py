@@ -135,10 +135,10 @@ class ZoneLatSpec:
             ``a`` and ``b``.
         """
         for zones, v in latency_spec.items():
-            if type(v) == str:
+            if isinstance(v, str):
                 if not v.isnumeric():
                     raise ValueError(f"non numeric latency value in '{zones}={v}'")
-            elif type(v) != int:
+            elif not isinstance(v, int):
                 raise ValueError(f"non numeric latency value in '{zones}={v}'")
             if len(zones) != 2:
                 raise ValueError(
