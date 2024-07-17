@@ -7,6 +7,7 @@ Wants=network-online.target
 Type=oneshot
 RemainAfterExit=yes
 Restart=no
+ExecStartPre=/bin/sleep 120
 ExecStart=/usr/bin/bash -c "/etc/network-latency.sh {{ latency_spec_opts }} {{ latency }}"
 ExecStop=/usr/bin/bash -c "/etc/network-latency.sh teardown"
 EnvironmentFile=/etc/network-split.env
