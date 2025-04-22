@@ -76,7 +76,7 @@ def run_ssh_node(cmd_list, node, timeout=600):
     return ssh_stdout, ssh_stderr
 
 
-def get_zone_config(zone_a, zone_b, zone_c, zone_x_addrs=None):
+def get_zone_config(zone_a, zone_b, zone_c, zone_x_addrs=None, kubeconfig=None):
     """
     For each valid ocp-network-split zone name (see
     :py:const:`ocpnetsplit.zone.ZONES`), translate it's given
@@ -88,6 +88,7 @@ def get_zone_config(zone_a, zone_b, zone_c, zone_x_addrs=None):
         zone_b (str): value of zone ``b`` label
         zone_c (str): value of zone ``c`` label
         zone_x_addrs (list): list of ip addresses in external zone ``x``
+        kubeconfig (str): file path to kubeconfig
 
     Returns:
         ZoneConfig: object with list of node ip addresses for each zone name
@@ -97,9 +98,9 @@ def get_zone_config(zone_a, zone_b, zone_c, zone_x_addrs=None):
     zc = zone.ZoneConfig()
     for zone_name, label in zip(zone.ZONES, [zone_a, zone_b, zone_c]):
         LOGGER.debug("listing all ip addresses of nodes in zone %s", zone)
-        cluster_nodes = ocp.list_cluster_nodes(label)
+        cluster_nodes = ocp.list_cluster_nodes(label, kubeconfig=kubeconfig)
         for node in cluster_nodes:
-            zc.add_nodes(zone_name, ocp.get_all_node_ip_addrs(node))
+            zc.add_nodes(zone_name, ocp.get_all_node_ip_addrs(node, kubeconfig=kubeconfig))
     if zone_x_addrs is not None:
         zc.add_nodes("x", zone_x_addrs)
     return zc
@@ -158,7 +159,7 @@ def get_networksplit_mc_spec(zone_env=None, split=False, latency=0, latency_spec
     return mc_spec
 
 
-def schedule_split(nodes, split_name, target_dt, target_length, use_ssh=False):
+def schedule_split(nodes, split_name, target_dt, target_length, use_ssh=False, kubeconfig=None):
     """
     Schedule start and stop of network split on all nodes of the cluster.
 
@@ -172,6 +173,7 @@ def schedule_split(nodes, split_name, target_dt, target_length, use_ssh=False):
             split configuration should be active
         use_ssh (bool): if true, connect to the nodes via ssh; use oc debug
             node otherwise
+        kubeconfig (str): file path to kubeconfig
 
     Raises:
         ValueError: in case invalid ``split_name`` or ``target_dt`` is
@@ -211,7 +213,7 @@ def schedule_split(nodes, split_name, target_dt, target_length, use_ssh=False):
         if use_ssh:
             run_ssh_node(cmd_list, node)
         else:
-            ocp.run_oc_debug_node(cmd_list, node)
+            ocp.run_oc_debug_node(cmd_list, node, kubeconfig=kubeconfig)
 
 
 def check_split(nodes, split_name, use_ssh=False):
